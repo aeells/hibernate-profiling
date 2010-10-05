@@ -1,0 +1,19 @@
+<!--
+  ~ Copyright (c) 2010, www.andrew-eells.com. All rights reserved.
+  -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        Hibernate model infrastructure objects.
+
+        Note that all model classes and methods are delibrately kept as not final. This is so Hibernate is able to proxy the classes for lazy loading
+        functionality.
+
+        In additon, (due to non-final methods only), please also ensure you DO NOT override methdos from @link
+        com.andreweells.persistence.insfrastructure.AbstractPersistentObject, these methods are meant to be final.
+    </body>
+</html>
