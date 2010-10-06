@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.aeells</groupId>
+    <groupId>com.andrew_eells</groupId>
     <artifactId>persistence</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
@@ -43,7 +43,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <dependencies>
 
         <dependency>
@@ -215,5 +215,29 @@
         </dependency>
 
     </dependencies>
+
+    <distributionManagement>
+        <site>
+            <id>qmetric</id>
+            <url>file://ec2-79-125-116-182.eu-west-1.compute.amazonaws.com/usr/local/tomcat/webapps/qmetric/</url>
+        </site>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>qmetric-snapshot</name>
+            <url>https://ec2-79-125-116-182.eu-west-1.compute.amazonaws.com:8443/nexus/content/repositories/qmetric-snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <repository>
+            <id>nexus</id>
+            <name>qmetric-releases</name>
+            <url>https://ec2-79-125-116-182.eu-west-1.compute.amazonaws.com:8443/nexus/content/repositories/qmetric-releases</url>
+        </repository>
+    </distributionManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:aeells/hibernate-persistence-framework.git</connection>
+        <url>scm:git:git@github.com:aeells/hibernate-persistence-framework.git</url>
+        <developerConnection>scm:git:git@github.com:aeells/hibernate-persistence-framework.git</developerConnection>
+    </scm>
 
 </project>
