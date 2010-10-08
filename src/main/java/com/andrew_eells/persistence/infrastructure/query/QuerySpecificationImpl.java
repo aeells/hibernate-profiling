@@ -5,8 +5,12 @@ package com.andrew_eells.persistence.infrastructure.query;
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
 import org.apache.commons.lang.Validate;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,9 +40,9 @@ public class QuerySpecificationImpl implements QuerySpecification
      * @param queryType Query type.
      * @param queryValue Query value.
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final QueryType queryType, final Object queryValue)
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final String queryType, final Object queryValue)
     {
-        this(persistentClass, new HashMap<QueryType, Object>()
+        this(persistentClass, new HashMap<String, Object>()
         {
             {
                 put(queryType, queryValue);
@@ -56,9 +60,9 @@ public class QuerySpecificationImpl implements QuerySpecification
      * @param queryValue Query value.
      * @param sortKey the key to sort on.
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final QueryType queryType, final Object queryValue, final SortKeyInfo sortKey)
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final String queryType, final Object queryValue, final SortKeyInfo sortKey)
     {
-        this(persistentClass, new HashMap<QueryType, Object>()
+        this(persistentClass, new HashMap<String, Object>()
         {
             {
                 put(queryType, queryValue);
@@ -75,7 +79,7 @@ public class QuerySpecificationImpl implements QuerySpecification
      * @param queryParams Query key-value parameters.
      * @param queryOperator Query operator.
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final Map<QueryType, Object> queryParams,
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final Map<String, Object> queryParams,
                                   final QuerySpecificationOperator queryOperator)
     {
         this(persistentClass, queryParams, SortKeyInfo.none(), queryOperator);
@@ -91,7 +95,7 @@ public class QuerySpecificationImpl implements QuerySpecification
      * @param sortKey sortkey
      * @param queryOperator query specification operator
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final Map<QueryType, Object> queryParams, final SortKeyInfo sortKey,
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final Map<String, Object> queryParams, final SortKeyInfo sortKey,
                                   QuerySpecificationOperator queryOperator)
     {
         // check we have a complete specification
@@ -115,10 +119,48 @@ public class QuerySpecificationImpl implements QuerySpecification
         this.queryOperator = queryOperator;
 
         // build query params
-        for (final Map.Entry<QueryType, Object> entry : queryParams.entrySet())
+        for (final Map.Entry<String, Object> entry : queryParams.entrySet())
         {
-            this.queryParams.put(QueryType.spec(persistentClass, entry.getKey()), entry.getValue());
+            this.queryParams.put(spec(persistentClass, entry.getKey()), entry.getValue());
         }
+    }
+
+    /**
+     * Identifies field name of class to be queried on.
+     *
+     * @param persistentClass Class of the object to be queried for.
+     * @param type Query type.
+     * @return Field name.
+     */
+    private QueryKeyInfo spec(final Class<? extends PersistenceStrategy> persistentClass, final String type)
+    {
+        final List<Field> fields = getAllFields(new ArrayList<Field>(), persistentClass);
+        for (final Field field : fields)
+        {
+            if (field.isAnnotationPresent(Queryable.class))
+            {
+                if (field.getAnnotation(Queryable.class).value().equals(type))
+                {
+                    final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
+                    return new QueryKeyInfo(field.getName(), caseSensitive);
+                }
+            }
+        }
+
+        throw new IllegalStateException("unable to query class " + persistentClass.getName() + " by type " + type);
+    }
+
+    private List<Field> getAllFields(List<Field> fields, final Class<?> type)
+    {
+        fields.addAll(Arrays.asList(type.getDeclaredFields()));
+
+        // recurse the AbstractPersistentObjectImpl fields incase this is a PRIMARY_KEY query
+        if (type.getSuperclass() != null)
+        {
+            fields = getAllFields(fields, type.getSuperclass());
+        }
+
+        return fields;
     }
 
     @Override public QuerySpecificationOperator getQueryOperator()

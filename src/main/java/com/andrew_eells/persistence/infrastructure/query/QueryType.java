@@ -2,98 +2,53 @@
 
 package com.andrew_eells.persistence.infrastructure.query;
 
-import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Query types.
  */
-public enum QueryType
+public final class QueryType
 {
     /**
      * Indicates primary key query.
      */
-    PRIMARY_KEY,
+    public static final String PRIMARY_KEY = "id";
 
     /**
      * Indicates foreign key query.
      */
-    FOREIGN_KEY,
+//    public static final String FOREIGN_KEY = "";
 
     /**
      * Indicates query based on customer id.
      */
-    CUSTOMER_ID,
+    public static final String CUSTOMER_ID = "customerId";
 
     /**
      * Indicates query based on tracking id.
      */
-    TRACKING_ID,
+    public static final String TRACKING_ID = "trackingId";
 
     /**
      * Indicates query based on e-mail address.
      */
-    EMAIL_ADDRESS,
+    public static final String EMAIL_ADDRESS = "email";
 
     /**
      * Indicates query based on customer first name.
      */
-    FIRST_NAME,
+    public static final String FIRST_NAME = "firstName";
 
     /**
      * Indicates query based on customer last name.
      */
-    LAST_NAME,
+    public static final String LAST_NAME = "lastName";
 
     /**
      * Indicates query based on customer phone number.
      */
-    PHONE_NUMBER_PRIMARY,
+    public static final String PHONE_NUMBER_PRIMARY = "phoneNumberPrimary";
 
     /**
      * Indicates query based on customer phone number 2.
      */
-    PHONE_NUMBER_SECONDARY;
-
-    /**
-     * Identifies field name of class to be queried on.
-     *
-     * @param persistentClass Class of the object to be queried for.
-     * @param type Query type.
-     * @return Field name.
-     */
-    public static QueryKeyInfo spec(final Class<? extends PersistenceStrategy> persistentClass, final QueryType type)
-    {
-        final List<Field> fields = getAllFields(new ArrayList<Field>(), persistentClass);
-        for (final Field field : fields)
-        {
-            if (field.isAnnotationPresent(Queryable.class))
-            {
-                if (field.getAnnotation(Queryable.class).value() == type)
-                {
-                    final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
-                    return new QueryKeyInfo(field.getName(), caseSensitive);
-                }
-            }
-        }
-
-        throw new IllegalStateException("unable to query class " + persistentClass.getName() + " by type " + type.name());
-    }
-
-    private static List<Field> getAllFields(List<Field> fields, final Class<?> type)
-    {
-        fields.addAll(Arrays.asList(type.getDeclaredFields()));
-
-        // recurse the AbstractPersistentObjectImpl fields incase this is a PRIMARY_KEY query
-        if (type.getSuperclass() != null)
-        {
-            fields = getAllFields(fields, type.getSuperclass());
-        }
-
-        return fields;
-    }
+    public static final String PHONE_NUMBER_SECONDARY = "phoneNumberSecondary";
 }

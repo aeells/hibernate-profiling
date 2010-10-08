@@ -216,10 +216,6 @@
     </dependencies>
 
     <distributionManagement>
-        <site>
-            <id>qmetric</id>
-            <url>file://ec2-79-125-116-182.eu-west-1.compute.amazonaws.com/usr/local/tomcat/webapps/qmetric/</url>
-        </site>
         <snapshotRepository>
             <id>nexus</id>
             <name>qmetric-snapshot</name>

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Queryable
 {
-    QueryType value();
+    String value();
 
     boolean isCaseSensitive() default true;
 }

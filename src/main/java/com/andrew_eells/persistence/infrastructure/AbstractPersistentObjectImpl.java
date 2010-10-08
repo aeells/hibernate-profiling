@@ -1,7 +1,6 @@
 // Copyright (c) 2007, Xbridge Ltd. All Rights Reserved.
 package com.andrew_eells.persistence.infrastructure;
 
-import com.andrew_eells.persistence.infrastructure.query.QueryType;
 import com.andrew_eells.persistence.infrastructure.query.Queryable;
 
 import javax.persistence.Column;
@@ -25,7 +24,7 @@ public abstract class AbstractPersistentObjectImpl implements PersistenceStrateg
 {
     // will be overriden with data read from database on reconstitution
     @Id
-    @Queryable(QueryType.PRIMARY_KEY)
+    @Queryable("id")
     private String id = UUID.randomUUID().toString();
 
     // int (instead of Integer) would be not nullable anyway, set by Hibernate using reflection

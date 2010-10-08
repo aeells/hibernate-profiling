@@ -103,7 +103,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new HashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new HashMap<String, Object>();
 
         final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
 
@@ -122,7 +122,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new HashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new HashMap<String, Object>();
 
         final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.OR);
 
@@ -157,7 +157,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new LinkedHashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
         queryParams.put(QueryType.CUSTOMER_ID, "12345678");
         queryParams.put(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com");
 
@@ -187,7 +187,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new LinkedHashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
         queryParams.put(QueryType.CUSTOMER_ID, "12345678");
         queryParams.put(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com");
 
@@ -214,7 +214,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new HashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new HashMap<String, Object>();
         queryParams.put(QueryType.EMAIL_ADDRESS, "a-user@andrew_eells.com");
 
         final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
@@ -285,7 +285,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new HashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new HashMap<String, Object>();
 
         final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
 
@@ -300,7 +300,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new HashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new HashMap<String, Object>();
 
         final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.OR);
 
@@ -315,7 +315,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new HashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new HashMap<String, Object>();
         queryParams.put(QueryType.CUSTOMER_ID, "12345678");
 
         final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
@@ -359,7 +359,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new LinkedHashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
         queryParams.put(QueryType.CUSTOMER_ID, "12345678");
         queryParams.put(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com");
 
@@ -385,7 +385,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<QueryType, Object> queryParams = new HashMap<QueryType, Object>();
+        final Map<String, Object> queryParams = new HashMap<String, Object>();
         queryParams.put(QueryType.EMAIL_ADDRESS, "a-user@andrew_eells.com");
 
         final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
