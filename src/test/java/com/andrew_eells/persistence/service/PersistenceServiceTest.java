@@ -5,6 +5,8 @@ package com.andrew_eells.persistence.service;
 import com.andrew_eells.persistence.infrastructure.AbstractPersistentObjectImpl;
 import com.andrew_eells.persistence.infrastructure.PersistenceSessionFactory;
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
+import com.andrew_eells.persistence.infrastructure.query.QueryClause;
+import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationOperator;
@@ -23,12 +25,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -103,9 +103,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new HashMap<String, Object>();
-
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, new ArrayList<QueryClause>(), QuerySpecificationOperator.AND);
 
         final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
 
@@ -114,7 +112,7 @@ public final class PersistenceServiceTest
         verify(mockCriteria, times(0)).add(any(Criterion.class));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void readUniqueOrWithoutQueryParams()
     {
         final MockPersistentObjectImpl mock = Mockito.spy(new MockPersistentObjectImpl());
@@ -122,9 +120,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new HashMap<String, Object>();
-
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.OR);
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, new ArrayList<QueryClause>(), QuerySpecificationOperator.OR);
 
         final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
     }
@@ -137,7 +133,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, QueryType.CUSTOMER_ID, "12345678");
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ));
 
         final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
 
@@ -157,11 +153,12 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
-        queryParams.put(QueryType.CUSTOMER_ID, "12345678");
-        queryParams.put(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com");
+        QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ);
+        QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com", QueryClauseOperator.EQ);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
+        List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
+
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.AND);
 
         final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
 
@@ -187,11 +184,12 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
-        queryParams.put(QueryType.CUSTOMER_ID, "12345678");
-        queryParams.put(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com");
+        QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ);
+        QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com", QueryClauseOperator.EQ);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.OR);
+        List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
+
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.OR);
 
         final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
 
@@ -200,10 +198,12 @@ public final class PersistenceServiceTest
         final ArgumentCaptor<Disjunction> captor = ArgumentCaptor.forClass(Disjunction.class);
         verify(mockCriteria).add(captor.capture());
         final Disjunction disjunction = captor.getValue();
-        assertEquals("unexpected expression", "(testCaseSensitiveCustomerId=12345678 or testCaseInSensitiveEmailAddress=firstname.lastname@andrew-eells.com)", disjunction.toString());
-        Assert.assertFalse("Ignore case value expected", (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(0), "ignoreCase"));
-        Assert.assertTrue("Ignore Case value not expected", (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(1), "ignoreCase"));
-
+        assertEquals("unexpected expression", "(testCaseSensitiveCustomerId=12345678 or testCaseInSensitiveEmailAddress=firstname.lastname@andrew-eells.com)",
+                     disjunction.toString());
+        Assert.assertFalse("Ignore case value expected",
+                           (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(0), "ignoreCase"));
+        Assert.assertTrue("Ignore Case value not expected",
+                          (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(1), "ignoreCase"));
     }
 
     @Test
@@ -214,10 +214,9 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new HashMap<String, Object>();
-        queryParams.put(QueryType.EMAIL_ADDRESS, "a-user@andrew_eells.com");
+        List<QueryClause> queryClauses = Arrays.asList(new QueryClause(QueryType.EMAIL_ADDRESS, "a-user@andrew_eells.com", QueryClauseOperator.EQ));
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.AND);
 
         final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
 
@@ -238,7 +237,8 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, QueryType.CUSTOMER_ID, "12345678", SortKeyInfo.ascending("testCaseSensitiveCustomerId"));
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ),
+                                                                        SortKeyInfo.ascending("testCaseSensitiveCustomerId"));
 
         final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
 
@@ -258,7 +258,8 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(mock);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, QueryType.CUSTOMER_ID, "12345678", SortKeyInfo.descending("testCaseSensitiveCustomerId"));
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ),
+                                                                        SortKeyInfo.descending("testCaseSensitiveCustomerId"));
 
         final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
 
@@ -269,7 +270,6 @@ public final class PersistenceServiceTest
         final Order order = captor.getValue();
         assertEquals("unexpected expression", "testCaseSensitiveCustomerId desc", order.toString());
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void readListNull()
@@ -285,9 +285,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new HashMap<String, Object>();
-
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, new ArrayList<QueryClause>(), QuerySpecificationOperator.AND);
 
         final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
     }
@@ -300,9 +298,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new HashMap<String, Object>();
-
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.OR);
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, new ArrayList<QueryClause>(), QuerySpecificationOperator.OR);
 
         final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
     }
@@ -315,10 +311,9 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new HashMap<String, Object>();
-        queryParams.put(QueryType.CUSTOMER_ID, "12345678");
+        List<QueryClause> queryClauses = Arrays.asList(new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ));
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.AND);
 
         final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
 
@@ -339,7 +334,7 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, QueryType.CUSTOMER_ID, "12345678");
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ));
 
         final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
 
@@ -359,11 +354,12 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
-        queryParams.put(QueryType.CUSTOMER_ID, "12345678");
-        queryParams.put(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com");
+        QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ);
+        QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com", QueryClauseOperator.EQ);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.OR);
+        List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
+
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.OR);
 
         final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
 
@@ -372,9 +368,12 @@ public final class PersistenceServiceTest
         final ArgumentCaptor<Disjunction> captor = ArgumentCaptor.forClass(Disjunction.class);
         verify(mockCriteria).add(captor.capture());
         final Disjunction disjunction = captor.getValue();
-        assertEquals("unexpected expression", "(testCaseSensitiveCustomerId=12345678 or testCaseInSensitiveEmailAddress=firstname.lastname@andrew-eells.com)", disjunction.toString());
-        Assert.assertFalse("Ignore case value not expected", (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(0), "ignoreCase"));
-        Assert.assertTrue("Ignore case value expected", (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(1), "ignoreCase"));
+        assertEquals("unexpected expression", "(testCaseSensitiveCustomerId=12345678 or testCaseInSensitiveEmailAddress=firstname.lastname@andrew-eells.com)",
+                     disjunction.toString());
+        Assert.assertFalse("Ignore case value not expected",
+                           (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(0), "ignoreCase"));
+        Assert.assertTrue("Ignore case value expected",
+                          (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(1), "ignoreCase"));
     }
 
     @Test
@@ -385,10 +384,9 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final Map<String, Object> queryParams = new HashMap<String, Object>();
-        queryParams.put(QueryType.EMAIL_ADDRESS, "a-user@andrew_eells.com");
+        final List<QueryClause> queryClauses = Arrays.asList(new QueryClause(QueryType.EMAIL_ADDRESS, "a-user@andrew_eells.com", QueryClauseOperator.EQ));
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryParams, QuerySpecificationOperator.AND);
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.AND);
 
         final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
 
@@ -409,7 +407,8 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, QueryType.CUSTOMER_ID, "12345678", SortKeyInfo.ascending("testCaseSensitiveCustomerId"));
+        final QuerySpecification querySpec =
+                new QuerySpecificationImpl(MockPersistentObjectImpl.class, new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ), SortKeyInfo.ascending("testCaseSensitiveCustomerId"));
 
         final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
 
@@ -429,7 +428,8 @@ public final class PersistenceServiceTest
         when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
         when(mockCriteria.list()).thenReturn(mock);
 
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, QueryType.CUSTOMER_ID, "12345678", SortKeyInfo.descending("testCaseSensitiveCustomerId"));
+        final QuerySpecification querySpec =
+                new QuerySpecificationImpl(MockPersistentObjectImpl.class, new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.EQ), SortKeyInfo.descending("testCaseSensitiveCustomerId"));
 
         final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
 
@@ -441,6 +441,119 @@ public final class PersistenceServiceTest
         assertEquals("unexpected expression", "testCaseSensitiveCustomerId desc", order.toString());
     }
 
+    @Test
+    public void readListAndWithEQOperator()
+    {
+        List<SimpleExpression> expressions = readListAndWithSpecifiedOperator(QueryClauseOperator.EQ);
+
+        Assert.assertEquals("testCaseSensitiveCustomerId=12345678", expressions.get(0).toString());
+        Assert.assertEquals("testCaseInSensitiveEmailAddress=firstname.lastname@andrew-eells.com", expressions.get(1).toString());
+    }
+
+    @Test
+    public void readListAndWithGTOperator()
+    {
+        List<SimpleExpression> expressions = readListAndWithSpecifiedOperator(QueryClauseOperator.GT);
+
+        Assert.assertEquals("testCaseSensitiveCustomerId>12345678", expressions.get(0).toString());
+        Assert.assertEquals("testCaseInSensitiveEmailAddress>firstname.lastname@andrew-eells.com", expressions.get(1).toString());
+    }
+
+    @Test
+    public void readListAndWithLTOperator()
+    {
+        List<SimpleExpression> expressions = readListAndWithSpecifiedOperator(QueryClauseOperator.LT);
+
+        Assert.assertEquals("testCaseSensitiveCustomerId<12345678", expressions.get(0).toString());
+        Assert.assertEquals("testCaseInSensitiveEmailAddress<firstname.lastname@andrew-eells.com", expressions.get(1).toString());
+    }
+
+    @Test
+    public void readListAndWithGTorEQOperator()
+    {
+        List<SimpleExpression> expressions = readListAndWithSpecifiedOperator(QueryClauseOperator.GT_OR_EQ);
+
+        Assert.assertEquals("testCaseSensitiveCustomerId>=12345678", expressions.get(0).toString());
+        Assert.assertEquals("testCaseInSensitiveEmailAddress>=firstname.lastname@andrew-eells.com", expressions.get(1).toString());
+    }
+
+    @Test
+    public void readListAndWithLTorEQOperator()
+    {
+        List<SimpleExpression> expressions = readListAndWithSpecifiedOperator(QueryClauseOperator.LT_OR_EQ);
+
+        Assert.assertEquals("testCaseSensitiveCustomerId<=12345678", expressions.get(0).toString());
+        Assert.assertEquals("testCaseInSensitiveEmailAddress<=firstname.lastname@andrew-eells.com", expressions.get(1).toString());
+    }
+
+    @Test
+    public void readListAndWithNotEQOperator()
+    {
+        List<SimpleExpression> expressions = readListAndWithSpecifiedOperator(QueryClauseOperator.NOT_EQ);
+
+        Assert.assertEquals("testCaseSensitiveCustomerId<>12345678", expressions.get(0).toString());
+        Assert.assertEquals("testCaseInSensitiveEmailAddress<>firstname.lastname@andrew-eells.com", expressions.get(1).toString());
+    }
+
+    private List<SimpleExpression> readListAndWithSpecifiedOperator(QueryClauseOperator queryClauseOperator)
+    {
+        final MockPersistentObjectImpl mock = Mockito.spy(new MockPersistentObjectImpl());
+
+        when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
+        when(mockCriteria.uniqueResult()).thenReturn(mock);
+
+        QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, "12345678", queryClauseOperator);
+        QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com", queryClauseOperator);
+
+        List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
+
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.AND);
+
+        final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
+
+        assertEquals("Unexpected persistence strategy obj", mock, strategy);
+
+        final ArgumentCaptor<SimpleExpression> captor = ArgumentCaptor.forClass(SimpleExpression.class);
+
+        verify(mockCriteria, times(2)).add(captor.capture());
+
+        List<SimpleExpression> expressions = captor.getAllValues();
+
+        Assert.assertFalse("Ignore case value expected", (Boolean) ReflectionTestUtils.getField(expressions.get(0), "ignoreCase"));
+        Assert.assertTrue("Ignore Case value not expected", (Boolean) ReflectionTestUtils.getField(expressions.get(1), "ignoreCase"));
+
+        return expressions;
+    }
+
+    @Test
+    public void readListOrWithDifferentConstraintOperators()
+    {
+        final List<MockPersistentObjectImpl> mock = Arrays.asList(Mockito.spy(new MockPersistentObjectImpl()));
+
+        when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
+        when(mockCriteria.list()).thenReturn(mock);
+
+        QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, "12345678", QueryClauseOperator.GT);
+        QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com", QueryClauseOperator.NOT_EQ);
+
+        List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
+
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.OR);
+
+        final List<PersistenceStrategy> strategies = persistenceService.readList(querySpec);
+
+        assertEquals("Unexpected persistence strategy obj", mock.get(0), strategies.get(0));
+
+        final ArgumentCaptor<Disjunction> captor = ArgumentCaptor.forClass(Disjunction.class);
+        verify(mockCriteria).add(captor.capture());
+        final Disjunction disjunction = captor.getValue();
+        assertEquals("unexpected expression", "(testCaseSensitiveCustomerId>12345678 or testCaseInSensitiveEmailAddress<>firstname.lastname@andrew-eells.com)",
+                     disjunction.toString());
+        Assert.assertFalse("Ignore case value not expected",
+                           (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(0), "ignoreCase"));
+        Assert.assertTrue("Ignore case value expected",
+                          (Boolean) ReflectionTestUtils.getField(((List) ReflectionTestUtils.getField(disjunction, "criteria")).get(1), "ignoreCase"));
+    }
 
     @Test
     public void deleteNull()

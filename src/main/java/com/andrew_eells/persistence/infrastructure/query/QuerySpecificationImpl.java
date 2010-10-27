@@ -37,17 +37,11 @@ public class QuerySpecificationImpl implements QuerySpecification
      * Use for querying with single field constraint with default ordering.
      *
      * @param persistentClass Class of the object to be queried for.
-     * @param queryType Query type.
-     * @param queryValue Query value.
+     * @param queryClause Query clause.
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final String queryType, final Object queryValue)
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, QueryClause queryClause)
     {
-        this(persistentClass, new HashMap<String, Object>()
-        {
-            {
-                put(queryType, queryValue);
-            }
-        }, SortKeyInfo.none(), QuerySpecificationOperator.NONE);
+        this(persistentClass, Arrays.asList(queryClause), SortKeyInfo.none(), QuerySpecificationOperator.NONE);
     }
 
     /**
@@ -56,18 +50,12 @@ public class QuerySpecificationImpl implements QuerySpecification
      * Use for querying with single field constraint where a specific ordering is required.
      *
      * @param persistentClass Class of the object to be queried for.
-     * @param queryType Query type.
-     * @param queryValue Query value.
+     * @param queryClause Query clause.
      * @param sortKey the key to sort on.
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final String queryType, final Object queryValue, final SortKeyInfo sortKey)
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, QueryClause queryClause, final SortKeyInfo sortKey)
     {
-        this(persistentClass, new HashMap<String, Object>()
-        {
-            {
-                put(queryType, queryValue);
-            }
-        }, sortKey, QuerySpecificationOperator.NONE);
+        this(persistentClass, Arrays.asList(queryClause), sortKey, QuerySpecificationOperator.NONE);
     }
 
     /**
@@ -76,13 +64,13 @@ public class QuerySpecificationImpl implements QuerySpecification
      * Use for querying with multiple field constraints where no ordering is required.
      *
      * @param persistentClass Class of the object to be queried for.
-     * @param queryParams Query key-value parameters.
+     * @param queryClauses Query clauses.
      * @param queryOperator Query operator.
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final Map<String, Object> queryParams,
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final List<QueryClause> queryClauses,
                                   final QuerySpecificationOperator queryOperator)
     {
-        this(persistentClass, queryParams, SortKeyInfo.none(), queryOperator);
+        this(persistentClass, queryClauses, SortKeyInfo.none(), queryOperator);
     }
 
     /**
@@ -91,37 +79,37 @@ public class QuerySpecificationImpl implements QuerySpecification
      * Use for querying with multiple field constraints where ordering is required.
      *
      * @param persistentClass Class of the object to be queried for.
-     * @param queryParams Query parameters
+     * @param queryClauses Query clauses
      * @param sortKey sortkey
      * @param queryOperator query specification operator
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final Map<String, Object> queryParams, final SortKeyInfo sortKey,
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final List<QueryClause> queryClauses, final SortKeyInfo sortKey,
                                   QuerySpecificationOperator queryOperator)
     {
         // check we have a complete specification
-        Validate.notEmpty(queryParams, "query specification invalid on empty or null queryParams!");
+        Validate.notEmpty(queryClauses, "query specification invalid on empty or null queryParams!");
         Validate.notNull(sortKey, "Query specification invalid on null sortKey");
 
         this.persistentClass = persistentClass;
         this.sortKey = sortKey;
 
-        if (queryParams.size() > 1)
+        if (queryClauses.size() > 1)
         {
-            // if we have more than one query parameter and if so enforce a valid query specification operator
+            // if we have more than one query clause and if so enforce a valid query specification operator
             Validate.isTrue(queryOperator != null && queryOperator != QuerySpecificationOperator.NONE,
                             "Query specification invalid on null queryOperator - queries with more than 1 parameter must have a OR/AND query operator");
         }
         else
         {
-            // if we only have a single query parameter then always set the query specification to none
+            // if we only have a single query clause then always set the query specification to none
             queryOperator = QuerySpecificationOperator.NONE;
         }
         this.queryOperator = queryOperator;
 
         // build query params
-        for (final Map.Entry<String, Object> entry : queryParams.entrySet())
+        for(QueryClause queryClause : queryClauses)
         {
-            this.queryParams.put(spec(persistentClass, entry.getKey()), entry.getValue());
+            this.queryParams.put(spec(persistentClass, queryClause.getFieldName(), queryClause.getOperator()), queryClause.getFieldValue());
         }
     }
 
@@ -130,9 +118,10 @@ public class QuerySpecificationImpl implements QuerySpecification
      *
      * @param persistentClass Class of the object to be queried for.
      * @param type Query type.
+     * @param operator QueryClauseOperator
      * @return Field name.
      */
-    private QueryKeyInfo spec(final Class<? extends PersistenceStrategy> persistentClass, final String type)
+    private QueryKeyInfo spec(final Class<? extends PersistenceStrategy> persistentClass, final String type, final QueryClauseOperator operator)
     {
         final List<Field> fields = getAllFields(new ArrayList<Field>(), persistentClass);
         for (final Field field : fields)
@@ -142,7 +131,7 @@ public class QuerySpecificationImpl implements QuerySpecification
                 if (field.getAnnotation(Queryable.class).value().equals(type))
                 {
                     final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
-                    return new QueryKeyInfo(field.getName(), caseSensitive);
+                    return new QueryKeyInfo(field.getName(), caseSensitive, operator);
                 }
             }
         }

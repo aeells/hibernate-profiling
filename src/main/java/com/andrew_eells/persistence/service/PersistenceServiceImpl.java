@@ -4,6 +4,7 @@ package com.andrew_eells.persistence.service;
 
 import com.andrew_eells.persistence.infrastructure.PersistenceSessionFactory;
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
+import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
 import com.andrew_eells.persistence.infrastructure.query.QueryKeyInfo;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
 import com.andrew_eells.persistence.infrastructure.query.SortKeyInfo;
@@ -128,7 +129,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         {
             final Object value = queryParams.get(keyInfo);
 
-            final SimpleExpression expression = Restrictions.eq(keyInfo.getKey(), value);
+            final SimpleExpression expression = expressionForOperator(keyInfo.getOperator(), keyInfo.getKey(), value);
             // ensure value is not null otherwise hibernate will throw an NPE
             if (value != null && !keyInfo.isCaseSensitive())
             {
@@ -149,7 +150,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         {
             final Object value = queryParams.get(keyInfo);
 
-            final SimpleExpression expression = Restrictions.eq(keyInfo.getKey(), value);
+            final SimpleExpression expression = expressionForOperator(keyInfo.getOperator(), keyInfo.getKey(), value);
             // ensure value is not null otherwise hibernate will throw an NPE
             if (value != null && !keyInfo.isCaseSensitive())
             {
@@ -162,5 +163,35 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         queryCriteria.add(disjunction);
 
         return queryCriteria;
+    }
+
+    private SimpleExpression expressionForOperator(final QueryClauseOperator operator, final String propertyName, final Object value)
+    {
+        SimpleExpression expression = null;
+        switch (operator)
+        {
+            case EQ:
+                expression = Restrictions.eq(propertyName, value);
+                break;
+            case GT:
+                expression = Restrictions.gt(propertyName, value);
+                break;
+            case LT:
+                expression = Restrictions.lt(propertyName, value);
+                break;
+            case LT_OR_EQ:
+                expression = Restrictions.le(propertyName, value);
+                break;
+            case GT_OR_EQ:
+                expression = Restrictions.ge(propertyName, value);
+                break;
+            case NOT_EQ:
+                expression = Restrictions.ne(propertyName, value);
+                break;
+            default:
+                // do nothing
+        }
+
+        return expression;
     }
 }

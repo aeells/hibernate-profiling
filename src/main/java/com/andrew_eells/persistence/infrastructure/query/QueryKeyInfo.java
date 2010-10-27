@@ -11,10 +11,13 @@ public class QueryKeyInfo
 
     private boolean caseSensitive;
 
-    public QueryKeyInfo(final String key, final boolean caseSensitive)
+    private QueryClauseOperator operator = QueryClauseOperator.EQ;
+
+    public QueryKeyInfo(final String key, final boolean caseSensitive, final QueryClauseOperator operator)
     {
         this.key = key;
         this.caseSensitive = caseSensitive;
+        this.operator = operator;
     }
 
     public final String getKey()
@@ -25,5 +28,10 @@ public class QueryKeyInfo
     public final boolean isCaseSensitive()
     {
         return caseSensitive;
+    }
+
+    public QueryClauseOperator getOperator()
+    {
+        return operator;
     }
 }
