@@ -495,36 +495,6 @@ public final class PersistenceServiceTest
         Assert.assertEquals("testCaseInSensitiveEmailAddress<>firstname.lastname@andrew-eells.com", expressions.get(1).toString());
     }
 
-    private List<SimpleExpression> readListAndWithSpecifiedOperator(QueryClauseOperator queryClauseOperator)
-    {
-        final MockPersistentObjectImpl mock = Mockito.spy(new MockPersistentObjectImpl());
-
-        when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
-        when(mockCriteria.uniqueResult()).thenReturn(mock);
-
-        QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, "12345678", queryClauseOperator);
-        QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com", queryClauseOperator);
-
-        List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
-
-        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.AND);
-
-        final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
-
-        assertEquals("Unexpected persistence strategy obj", mock, strategy);
-
-        final ArgumentCaptor<SimpleExpression> captor = ArgumentCaptor.forClass(SimpleExpression.class);
-
-        verify(mockCriteria, times(2)).add(captor.capture());
-
-        List<SimpleExpression> expressions = captor.getAllValues();
-
-        Assert.assertFalse("Ignore case value expected", (Boolean) ReflectionTestUtils.getField(expressions.get(0), "ignoreCase"));
-        Assert.assertTrue("Ignore Case value not expected", (Boolean) ReflectionTestUtils.getField(expressions.get(1), "ignoreCase"));
-
-        return expressions;
-    }
-
     @Test
     public void readListOrWithDifferentConstraintOperators()
     {
@@ -629,6 +599,36 @@ public final class PersistenceServiceTest
         verify(mockSessionFactory, times(1)).getSession();
         verify(mockSession, times(1)).merge(mock);
         verify(mock, times(1)).setLastModified((Date) anyObject());
+    }
+
+    private List<SimpleExpression> readListAndWithSpecifiedOperator(QueryClauseOperator queryClauseOperator)
+    {
+        final MockPersistentObjectImpl mock = Mockito.spy(new MockPersistentObjectImpl());
+
+        when(mockSession.createCriteria(MockPersistentObjectImpl.class)).thenReturn(mockCriteria);
+        when(mockCriteria.uniqueResult()).thenReturn(mock);
+
+        QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, "12345678", queryClauseOperator);
+        QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, "firstname.lastname@andrew-eells.com", queryClauseOperator);
+
+        List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
+
+        final QuerySpecification querySpec = new QuerySpecificationImpl(MockPersistentObjectImpl.class, queryClauses, QuerySpecificationOperator.AND);
+
+        final PersistenceStrategy strategy = persistenceService.readUnique(querySpec);
+
+        assertEquals("Unexpected persistence strategy obj", mock, strategy);
+
+        final ArgumentCaptor<SimpleExpression> captor = ArgumentCaptor.forClass(SimpleExpression.class);
+
+        verify(mockCriteria, times(2)).add(captor.capture());
+
+        List<SimpleExpression> expressions = captor.getAllValues();
+
+        Assert.assertFalse("Ignore case value expected", (Boolean) ReflectionTestUtils.getField(expressions.get(0), "ignoreCase"));
+        Assert.assertTrue("Ignore Case value not expected", (Boolean) ReflectionTestUtils.getField(expressions.get(1), "ignoreCase"));
+
+        return expressions;
     }
 
     class MockPersistentObjectImpl extends AbstractPersistentObjectImpl
