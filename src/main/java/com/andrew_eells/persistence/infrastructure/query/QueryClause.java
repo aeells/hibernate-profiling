@@ -7,11 +7,11 @@ public class QueryClause
 {
     private String fieldName;
 
-    private String fieldValue;
+    private Object fieldValue;
 
     private QueryClauseOperator operator = null;
 
-    public QueryClause(final String fieldName, final String fieldValue, final QueryClauseOperator operator)
+    public QueryClause(final String fieldName, final Object fieldValue, final QueryClauseOperator operator)
     {
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
@@ -28,7 +28,7 @@ public class QueryClause
         return fieldName;
     }
 
-    public String getFieldValue()
+    public Object getFieldValue()
     {
         return fieldValue;
     }
