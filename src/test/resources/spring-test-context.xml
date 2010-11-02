@@ -35,16 +35,8 @@ http://www.springframework.org/schema/aop http://www.springframework.org/schema/
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <!--<bean id="service" class="com.andrew_eells.persistence.service.PersistenceServiceImpl">-->
-        <!--<constructor-arg>-->
-            <!--<bean class="org.springframework.orm.hibernate3.HibernateTemplate">-->
-                <!--<constructor-arg ref="sessionFactory" />-->
-            <!--</bean>-->
-        <!--</constructor-arg>-->
-    <!--</bean>-->
-
-    <bean class="com.andrew_eells.persistence.infrastructure.PersistenceSessionFactoryImpl" autowire="constructor" />
+    <bean class="org.springframework.orm.hibernate3.HibernateTemplate" autowire="constructor" />
+    <bean class="com.andrew_eells.persistence.service.QuerySpecificationTranslator" />
 
     <bean id="service" class="com.andrew_eells.persistence.service.PersistenceServiceImpl" autowire="constructor" />
-
 </beans>

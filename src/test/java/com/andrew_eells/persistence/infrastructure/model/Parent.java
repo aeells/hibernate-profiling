@@ -1,7 +1,6 @@
 package com.andrew_eells.persistence.infrastructure.model;
 
-import com.andrew_eells.persistence.infrastructure.AbstractPersistentObjectImpl;
-import com.andrew_eells.persistence.infrastructure.model.Child;
+import com.andrew_eells.persistence.infrastructure.AbstractPersistentObject;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -17,7 +16,7 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
-public class Parent extends AbstractPersistentObjectImpl
+public class Parent extends AbstractPersistentObject
 {
     private static final String[] EXCLUDED_FIELDS = {"children"};
 

@@ -1,6 +1,6 @@
 package com.andrew_eells.persistence.infrastructure.model;
 
-import com.andrew_eells.persistence.infrastructure.AbstractPersistentObjectImpl;
+import com.andrew_eells.persistence.infrastructure.AbstractPersistentObject;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -10,7 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Child extends AbstractPersistentObjectImpl
+public class Child extends AbstractPersistentObject
 {
     @ManyToOne @JoinColumn(name = "PARENT_ID")
     private Parent parent;

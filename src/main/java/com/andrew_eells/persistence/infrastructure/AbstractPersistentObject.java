@@ -16,7 +16,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 /**
- * AbstractPersistentObjectImpl is the abstract base class for domain model. It provides a all objects with an identifier, a verison to support optimistic locking, a date when the
+ * AbstractPersistentObject is the abstract base class for domain model. It provides a all objects with an identifier, a verison to support optimistic locking, a date when the
  * object was created and one when it was last updated.
  * <p/>
  * Last update date is intended to rely on a database trigger - there is no code to actually set it correctly on the Java layer.
@@ -24,7 +24,7 @@ import javax.persistence.Version;
  * NOTE: The majority of the methods within this class should be final.  Please see package level comments for a description why.
  */
 @MappedSuperclass
-public abstract class AbstractPersistentObjectImpl implements PersistenceStrategy
+public abstract class AbstractPersistentObject implements PersistenceStrategy
 {
     @Id @GeneratedValue(generator = "system-uuid") @GenericGenerator(name = "system-uuid", strategy = "uuid") @Queryable("id")
     private String id;

@@ -16,12 +16,12 @@ public class AbstractPersistentObjectImplTest
     @Test
     public void shouldBeAbleToDistinguishObjects() throws Exception
     {
-        final AbstractPersistentObjectImpl parent = new Parent();
+        final AbstractPersistentObject parent = new Parent();
         parent.setCreated(new DateTime());
         parent.setLastModified(new DateTime());
         parent.setVersion(1);
 
-        final AbstractPersistentObjectImpl parent2 = new Parent();
+        final AbstractPersistentObject parent2 = new Parent();
         parent.setCreated(new DateTime(System.currentTimeMillis() + 1000));
         parent.setLastModified(new DateTime(System.currentTimeMillis() + 1000));
         parent.setVersion(2);

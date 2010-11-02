@@ -2,6 +2,11 @@
 
 package com.andrew_eells.persistence.infrastructure.query;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 /**
  * Represents intended query sort key field and order information.
  */
@@ -81,6 +86,7 @@ public final class SortKeyInfo {
 
     /**
      * Returns this sort key field name.
+     *
      * @return Field name.
      */
     public String getField() {
@@ -89,9 +95,26 @@ public final class SortKeyInfo {
 
     /**
      * Returns this sort key order information.
+     *
      * @return Sort key order.
      */
     public Order getOrder() {
         return order;
+    }
+
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SIMPLE_STYLE);
     }
 }
