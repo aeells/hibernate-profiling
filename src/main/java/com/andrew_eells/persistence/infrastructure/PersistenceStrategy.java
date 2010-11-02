@@ -2,7 +2,7 @@
 
 package com.andrew_eells.persistence.infrastructure;
 
-import java.util.Date;
+import org.joda.time.DateTime;
 
 /**
  * Persistence strategy.
@@ -34,5 +34,5 @@ public interface PersistenceStrategy
      * Sets the last modified time.
      * @param time the time the implementation was last modified.
      */
-    void setLastModified(Date time);
+    void setLastModified(DateTime time);
 }

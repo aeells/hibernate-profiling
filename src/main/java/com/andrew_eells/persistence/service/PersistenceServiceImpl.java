@@ -2,24 +2,24 @@
 
 package com.andrew_eells.persistence.service;
 
-import com.andrew_eells.persistence.infrastructure.PersistenceSessionFactory;
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
 import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
 import com.andrew_eells.persistence.infrastructure.query.QueryKeyInfo;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
+import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
 import com.andrew_eells.persistence.infrastructure.query.SortKeyInfo;
 import org.apache.commons.lang.Validate;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,59 +29,29 @@ import java.util.Map;
 @Service("persistenceService") @Transactional
 public class PersistenceServiceImpl implements PersistenceService<PersistenceStrategy>
 {
-    private PersistenceSessionFactory persistenceSessionFactory;
+    private final HibernateTemplate hibernateTemplate;
 
     @Autowired
-    public PersistenceServiceImpl(final PersistenceSessionFactory persistenceSessionFactory)
+    public PersistenceServiceImpl(final HibernateTemplate hibernateTemplate)
     {
-        this.persistenceSessionFactory = persistenceSessionFactory;
+        this.hibernateTemplate = hibernateTemplate;
     }
 
     @Override public final void create(final PersistenceStrategy model)
     {
         if (model != null && model.isCreate())
         {
-            final Session session = persistenceSessionFactory.getSession();
-
-            session.saveOrUpdate(model);
+            saveOrUpdate(model);
         }
     }
 
-    @Override public final PersistenceStrategy readUnique(final QuerySpecification querySpecification)
-    {
-        Validate.notNull(querySpecification, "query specification should be non-null!");
-        final Criteria queryCriteria = translateSpecification(querySpecification);
-
-        //noinspection unchecked
-        return (PersistenceStrategy) queryCriteria.uniqueResult();
-    }
-
-    @Override public final List<PersistenceStrategy> readList(final QuerySpecification querySpecification)
-    {
-        Validate.notNull(querySpecification, "query specification should be non-null!");
-        final Criteria queryCriteria = translateSpecification(querySpecification);
-
-        //noinspection unchecked
-        return (List<PersistenceStrategy>) queryCriteria.list();
-    }
-
-    @Override public final PersistenceStrategy update(final PersistenceStrategy model)
+    @Override public final void update(final PersistenceStrategy model)
     {
         if (model != null && model.isUpdate())
         {
-            final Session session = persistenceSessionFactory.getSession();
+            model.setLastModified(new DateTime());
 
-            model.setLastModified(new Date());
-
-            // need to merge as opposed to saveOrUpdate as dozer has created a new object (with the same identifier) on the way back down
-            // through the stack and hibernate will throw a NonUniqueObjectException
-            // http://www.stevideter.com/2008/12/07/saveorupdate-versus-merge-in-hibernate/
-            //noinspection unchecked
-            return (PersistenceStrategy) session.merge(model);
-        }
-        else
-        {
-            return null;
+            saveOrUpdate(model);
         }
     }
 
@@ -89,17 +59,34 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
     {
         if (model != null && model.isDelete())
         {
-            final Session session = persistenceSessionFactory.getSession();
-
-            session.delete(model);
+            hibernateTemplate.delete(model);
         }
     }
 
-    private Criteria translateSpecification(final QuerySpecification querySpecification)
+    @Override public final PersistenceStrategy readUnique(final QuerySpecification querySpecification)
+    {
+        Validate.notNull(querySpecification, "query specification should be non-null!");
+
+        return QuerySpecificationImpl.uniqueElement((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(translateSpecification(querySpecification)));
+    }
+
+    @Override public final List<PersistenceStrategy> readList(final QuerySpecification querySpecification)
+    {
+        Validate.notNull(querySpecification, "query specification should be non-null!");
+
+        return hibernateTemplate.findByCriteria(translateSpecification(querySpecification));
+    }
+
+    private void saveOrUpdate(final PersistenceStrategy model)
+    {
+        hibernateTemplate.saveOrUpdate(model);
+    }
+
+    private DetachedCriteria translateSpecification(final QuerySpecification querySpecification)
     {
         final Map<QueryKeyInfo, Object> queryParams = querySpecification.getQueryParams();
-        final Session session = persistenceSessionFactory.getSession();
-        final Criteria queryCriteria = session.createCriteria(querySpecification.getPersistentClass());
+
+        DetachedCriteria queryCriteria = DetachedCriteria.forClass(querySpecification.getPersistentClass());
 
         switch (querySpecification.getQueryOperator())
         {
@@ -123,7 +110,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         return queryCriteria;
     }
 
-    private Criteria translateQueryParamsForAndOperator(final Map<QueryKeyInfo, Object> queryParams, final Criteria queryCriteria)
+    private DetachedCriteria translateQueryParamsForAndOperator(final Map<QueryKeyInfo, Object> queryParams, final DetachedCriteria queryCriteria)
     {
         for (final QueryKeyInfo keyInfo : queryParams.keySet())
         {
@@ -142,7 +129,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         return queryCriteria;
     }
 
-    private Criteria translateQueryParamsForOrOperator(final Map<QueryKeyInfo, Object> queryParams, final Criteria queryCriteria)
+    private DetachedCriteria translateQueryParamsForOrOperator(final Map<QueryKeyInfo, Object> queryParams, final DetachedCriteria queryCriteria)
     {
         final Disjunction disjunction = Restrictions.disjunction();
 

@@ -4,11 +4,11 @@ package com.andrew_eells.persistence.infrastructure.query;
 
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
 import org.apache.commons.lang.Validate;
+import org.hibernate.NonUniqueResultException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +67,7 @@ public class QuerySpecificationImpl implements QuerySpecification
      * @param queryClauses Query clauses.
      * @param queryOperator Query operator.
      */
-    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final List<QueryClause> queryClauses,
-                                  final QuerySpecificationOperator queryOperator)
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, final List<QueryClause> queryClauses, final QuerySpecificationOperator queryOperator)
     {
         this(persistentClass, queryClauses, SortKeyInfo.none(), queryOperator);
     }
@@ -107,7 +106,7 @@ public class QuerySpecificationImpl implements QuerySpecification
         this.queryOperator = queryOperator;
 
         // build query params
-        for(QueryClause queryClause : queryClauses)
+        for (QueryClause queryClause : queryClauses)
         {
             this.queryParams.put(spec(persistentClass, queryClause.getFieldName(), queryClause.getOperator()), queryClause.getFieldValue());
         }
@@ -150,6 +149,24 @@ public class QuerySpecificationImpl implements QuerySpecification
         }
 
         return fields;
+    }
+
+    public static <T> T uniqueElement(List<T> list) throws NonUniqueResultException
+    {
+        int size = list.size();
+        if (size == 0)
+        {
+            return null;
+        }
+        T first = list.get(0);
+        for (int i = 1; i < size; i++)
+        {
+            if (list.get(i) != first)
+            {
+                throw new NonUniqueResultException(list.size());
+            }
+        }
+        return first;
     }
 
     @Override public QuerySpecificationOperator getQueryOperator()

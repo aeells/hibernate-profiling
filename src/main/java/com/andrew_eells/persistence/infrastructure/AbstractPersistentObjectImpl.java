@@ -1,19 +1,23 @@
-// Copyright (c) 2007, Xbridge Ltd. All Rights Reserved.
 package com.andrew_eells.persistence.infrastructure;
 
 import com.andrew_eells.persistence.infrastructure.query.Queryable;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
-import java.util.Date;
-import java.util.UUID;
-
 /**
- * AbstractPersistentObjectImpl is the abstract base class for domain model. It provides a all objects with an identifier, a verison to support optimistic
- * locking, a date when the object was created and one when it was last updated.
+ * AbstractPersistentObjectImpl is the abstract base class for domain model. It provides a all objects with an identifier, a verison to support optimistic locking, a date when the
+ * object was created and one when it was last updated.
  * <p/>
  * Last update date is intended to rely on a database trigger - there is no code to actually set it correctly on the Java layer.
  * <p/>
@@ -22,22 +26,19 @@ import java.util.UUID;
 @MappedSuperclass
 public abstract class AbstractPersistentObjectImpl implements PersistenceStrategy
 {
-    // will be overriden with data read from database on reconstitution
-    @Id
-    @Queryable("id")
-    private String id = UUID.randomUUID().toString();
+    @Id @GeneratedValue(generator = "system-uuid") @GenericGenerator(name = "system-uuid", strategy = "uuid") @Queryable("id")
+    private String id;
 
     // int (instead of Integer) would be not nullable anyway, set by Hibernate using reflection
+
     @Version @Column(nullable = false) @SuppressWarnings({"UnusedDeclaration"})
     private int version;
 
-    // will be overrriden with data read from database
-    @Column(nullable = false)
-    private Date created = new Date();
+    @Column(nullable = false) @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime created = new DateTime();
 
-    // will be overrriden with data read from database
-    @Column(nullable = false, name = "LAST_MODIFIED")
-    private Date lastModified = new Date();
+    @Column(nullable = false, name = "LAST_MODIFIED") @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime lastModified = new DateTime();
 
     public String getId()
     {
@@ -49,22 +50,22 @@ public abstract class AbstractPersistentObjectImpl implements PersistenceStrateg
         this.id = id;
     }
 
-    public Date getCreated()
+    public DateTime getCreated()
     {
         return created;
     }
 
-    public void setCreated(final Date created)
+    public void setCreated(final DateTime created)
     {
         this.created = created;
     }
 
-    public Date getLastModified()
+    public DateTime getLastModified()
     {
         return lastModified;
     }
 
-    @Override public void setLastModified(final Date lastModified)
+    @Override public void setLastModified(final DateTime lastModified)
     {
         this.lastModified = lastModified;
     }
@@ -79,34 +80,18 @@ public abstract class AbstractPersistentObjectImpl implements PersistenceStrateg
         this.version = version;
     }
 
-    /**
-     * Concatenate id and fully qualified classname. If used in AbstractPersistentObjectImpl.equals() String.equals should return immediately if ids are
-     * not the same.
-     *
-     * @return Unique object identifier.
-     */
-    private String getInternalId()
-    {
-        return id + ":" + getClass().getName();
-    }
-
-    @Override public boolean equals(final Object o)
-    {
-        return this == o ||
-               ((o instanceof AbstractPersistentObjectImpl) && ((id != null) && getInternalId().equals(((AbstractPersistentObjectImpl) o).getInternalId())));
-    }
-
-    /**
-     * we are not using getInternalId() (but id itself) as this is still fulfilling the Object.hashCode() contract.
-     * NOTE: Method should be 'final', see package level comments.
-     */
     @Override public int hashCode()
     {
-        return (id != null) ? id.hashCode() : super.hashCode();
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override public boolean equals(final Object obj)
+    {
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 
     @Override public String toString()
     {
-        return getClass().getName() + "[id=" + id + "]";
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SIMPLE_STYLE);
     }
 }
