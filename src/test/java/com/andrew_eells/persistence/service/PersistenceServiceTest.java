@@ -18,29 +18,38 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public final class PersistenceServiceTest {
+public final class PersistenceServiceTest
+{
     private HibernateTemplate hibernateTemplate = mock(HibernateTemplate.class);
+
     private QuerySpecificationTranslator translator = mock(QuerySpecificationTranslator.class);
 
     private PersistenceServiceImpl persistenceService = new PersistenceServiceImpl(hibernateTemplate, translator);
+
     private PersistentObjectStub persistenceStrategy;
 
     @Before
-    public void context() {
+    public void context()
+    {
         persistenceStrategy = new PersistentObjectStub();
     }
 
     @Test
-    public void shouldNotFailWhenAttemptingToPersistNull() {
+    public void shouldNotFailWhenAttemptingToPersistNull()
+    {
         persistenceService.create(null);
 
         verify(hibernateTemplate, times(0)).saveOrUpdate(Matchers.<Object>anyObject());
     }
 
     @Test
-    public void shouldNotPersistWhenCreateIsDisabled() {
+    public void shouldNotPersistWhenCreateIsDisabled()
+    {
         persistenceStrategy.create = false;
 
         persistenceService.create(persistenceStrategy);
@@ -49,7 +58,8 @@ public final class PersistenceServiceTest {
     }
 
     @Test
-    public void shouldDeleteWhenDeleteIsEnabled() {
+    public void shouldDeleteWhenDeleteIsEnabled()
+    {
         persistenceStrategy.delete = true;
 
         persistenceService.delete(persistenceStrategy);
@@ -58,14 +68,16 @@ public final class PersistenceServiceTest {
     }
 
     @Test
-    public void shouldNotFailWhenAttemptingToDeleteNull() {
+    public void shouldNotFailWhenAttemptingToDeleteNull()
+    {
         persistenceService.delete(null);
 
         verify(hibernateTemplate, times(0)).delete(Matchers.<Object>anyObject());
     }
 
     @Test
-    public void shouldNotDeleteWhenDeleteIsDisabled() {
+    public void shouldNotDeleteWhenDeleteIsDisabled()
+    {
         persistenceStrategy.delete = false;
 
         persistenceService.delete(persistenceStrategy);
@@ -74,7 +86,8 @@ public final class PersistenceServiceTest {
     }
 
     @Test
-    public void shouldUpdateWhenUpdateIsEnabled() {
+    public void shouldUpdateWhenUpdateIsEnabled()
+    {
         persistenceStrategy.update = true;
 
         persistenceService.update(persistenceStrategy);
@@ -83,14 +96,16 @@ public final class PersistenceServiceTest {
     }
 
     @Test
-    public void shouldNotFailWhenAttemptingToUpdateNull() {
+    public void shouldNotFailWhenAttemptingToUpdateNull()
+    {
         persistenceService.update(null);
 
         verify(hibernateTemplate, times(0)).saveOrUpdate(Matchers.<Object>anyObject());
     }
 
     @Test
-    public void shouldNotUpdateWhenUpdateIsDisabled() {
+    public void shouldNotUpdateWhenUpdateIsDisabled()
+    {
         persistenceStrategy.update = false;
 
         persistenceService.update(persistenceStrategy);
@@ -99,7 +114,8 @@ public final class PersistenceServiceTest {
     }
 
     @Test
-    public void shouldPersistWhenCreateIsEnabled() {
+    public void shouldPersistWhenCreateIsEnabled()
+    {
         persistenceStrategy.create = true;
 
         persistenceService.create(persistenceStrategy);
@@ -108,17 +124,20 @@ public final class PersistenceServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowExceptionWithNullSpecificationToReadUnique() {
+    public void shouldThrowExceptionWithNullSpecificationToReadUnique()
+    {
         persistenceService.readUnique(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowExceptionWithNullSpecificationToReadList() {
+    public void shouldThrowExceptionWithNullSpecificationToReadList()
+    {
         persistenceService.readList(null);
     }
 
     @Test
-    public void shouldFindUniquePersistentObject() {
+    public void shouldFindUniquePersistentObject()
+    {
 
         QuerySpecification querySpecification = mock(QuerySpecification.class);
 
@@ -132,11 +151,11 @@ public final class PersistenceServiceTest {
         persistenceService.readUnique(querySpecification);
 
         verify(hibernateTemplate).findByCriteria(criteria);
-
     }
 
     @Test
-    public void shouldSuccessfullyHandleNotFindingUniqueEntity() {
+    public void shouldSuccessfullyHandleNotFindingUniqueEntity()
+    {
         QuerySpecification querySpecification = mock(QuerySpecification.class);
 
         DetachedCriteria criteria = mock(DetachedCriteria.class);
@@ -154,7 +173,8 @@ public final class PersistenceServiceTest {
     }
 
     @Test(expected = NonUniqueResultException.class)
-    public void shouldThrowUniqueExceptionWhenReadUniqueReturnsMoreThanOneResult() {
+    public void shouldThrowUniqueExceptionWhenReadUniqueReturnsMoreThanOneResult()
+    {
         QuerySpecification querySpecification = mock(QuerySpecification.class);
 
         DetachedCriteria criteria = mock(DetachedCriteria.class);
@@ -168,7 +188,8 @@ public final class PersistenceServiceTest {
     }
 
     @Test
-    public void shouldSuccessfullyHandleListResult() {
+    public void shouldSuccessfullyHandleListResult()
+    {
         QuerySpecification querySpecification = mock(QuerySpecification.class);
 
         DetachedCriteria criteria = mock(DetachedCriteria.class);
@@ -183,26 +204,31 @@ public final class PersistenceServiceTest {
         verify(hibernateTemplate).findByCriteria(criteria);
     }
 
-    private class PersistentObjectStub extends AbstractPersistentObject {
+    private class PersistentObjectStub extends AbstractPersistentObject
+    {
 
         public boolean create;
+
         public boolean update;
+
         public boolean delete;
 
         @Override
-        public boolean isCreate() {
+        public boolean isCreatable()
+        {
             return create;
         }
 
         @Override
-        public boolean isUpdate() {
+        public boolean isUpdateable()
+        {
             return update;
         }
 
         @Override
-        public boolean isDelete() {
+        public boolean isDeletable()
+        {
             return delete;
         }
     }
-
 }

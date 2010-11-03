@@ -32,7 +32,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
 
     @Override public final void create(final PersistenceStrategy model)
     {
-        if (model != null && model.isCreate())
+        if (model != null && model.isCreatable())
         {
             saveOrUpdate(model);
         }
@@ -40,7 +40,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
 
     @Override public final void update(final PersistenceStrategy model)
     {
-        if (model != null && model.isUpdate())
+        if (model != null && model.isUpdateable())
         {
             model.setLastModified(new DateTime());
 
@@ -50,7 +50,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
 
     @Override public final void delete(final PersistenceStrategy model)
     {
-        if (model != null && model.isDelete())
+        if (model != null && model.isDeletable())
         {
             hibernateTemplate.delete(model);
         }

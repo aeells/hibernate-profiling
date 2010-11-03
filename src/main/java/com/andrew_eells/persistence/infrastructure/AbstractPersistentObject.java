@@ -62,6 +62,21 @@ public abstract class AbstractPersistentObject implements PersistenceStrategy {
         return lastModified;
     }
 
+    @Override public boolean isCreatable()
+    {
+        return true;
+    }
+
+    @Override public boolean isUpdateable()
+    {
+        return true;
+    }
+
+    @Override public boolean isDeletable()
+    {
+        return true;
+    }
+
     @Override
     public void setLastModified(final DateTime lastModified) {
         this.lastModified = lastModified;

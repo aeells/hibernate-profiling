@@ -40,17 +40,17 @@ public class Parent extends AbstractPersistentObject
         return Collections.unmodifiableList(this.children);
     }
 
-    @Override public boolean isCreate()
+    @Override public boolean isCreatable()
     {
         return true;
     }
 
-    @Override public boolean isUpdate()
+    @Override public boolean isUpdateable()
     {
         return true;
     }
 
-    @Override public boolean isDelete()
+    @Override public boolean isDeletable()
     {
         return true;
     }

@@ -14,21 +14,21 @@ public interface PersistenceStrategy
      *
      * @return <code>true</code> if the implementation should be created; <code>false</code> otherwise.
      */
-    boolean isCreate();
+    boolean isCreatable();
 
     /**
      * Defines update behaviour.
      *
      * @return <code>true</code> if the implementation should be updated; <code>false</code> otherwise.
      */
-    boolean isUpdate();
+    boolean isUpdateable();
 
     /**
      * Defines delete behaviour.
      *
      * @return <code>true</code> if the implementation should be deleted; <code>false</code> otherwise.
      */
-    boolean isDelete();
+    boolean isDeletable();
 
     /**
      * Sets the last modified time.
