@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class QuerySpecificationTranslator {
 
-    public DetachedCriteria translateSpecification(final QuerySpecification querySpecification)
+    public DetachedCriteria translate(final QuerySpecification querySpecification)
     {
         final Map<QueryKeyInfo, Object> queryParams = querySpecification.getQueryParams();
 
@@ -38,7 +38,7 @@ public class QuerySpecificationTranslator {
         return queryCriteria;
     }
 
-    public DetachedCriteria translateQueryParamsForAndOperator(final Map<QueryKeyInfo, Object> queryParams, final DetachedCriteria queryCriteria)
+    private DetachedCriteria translateQueryParamsForAndOperator(final Map<QueryKeyInfo, Object> queryParams, final DetachedCriteria queryCriteria)
     {
         for (final QueryKeyInfo keyInfo : queryParams.keySet())
         {
@@ -57,7 +57,7 @@ public class QuerySpecificationTranslator {
         return queryCriteria;
     }
 
-    public DetachedCriteria translateQueryParamsForOrOperator(final Map<QueryKeyInfo, Object> queryParams, final DetachedCriteria queryCriteria)
+    private DetachedCriteria translateQueryParamsForOrOperator(final Map<QueryKeyInfo, Object> queryParams, final DetachedCriteria queryCriteria)
     {
         final Disjunction disjunction = Restrictions.disjunction();
 

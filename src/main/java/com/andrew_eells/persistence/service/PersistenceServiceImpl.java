@@ -3,17 +3,9 @@
 package com.andrew_eells.persistence.service;
 
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
-import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
-import com.andrew_eells.persistence.infrastructure.query.QueryKeyInfo;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
-import com.andrew_eells.persistence.infrastructure.query.SortKeyInfo;
 import org.apache.commons.lang.Validate;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -21,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Standardised database repository access implementation.
@@ -76,7 +67,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
     {
         Validate.notNull(querySpecification, "query specification should be non-null!");
 
-        return hibernateTemplate.findByCriteria(translator.translateSpecification(querySpecification));
+        return hibernateTemplate.findByCriteria(translator.translate(querySpecification));
     }
 
     private void saveOrUpdate(final PersistenceStrategy model)

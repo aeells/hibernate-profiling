@@ -123,7 +123,7 @@ public final class PersistenceServiceTest {
         QuerySpecification querySpecification = mock(QuerySpecification.class);
 
         DetachedCriteria criteria = mock(DetachedCriteria.class);
-        when(translator.translateSpecification(querySpecification)).thenReturn(criteria);
+        when(translator.translate(querySpecification)).thenReturn(criteria);
 
         List itemInList = Arrays.asList(new PersistentObjectStub());
 
@@ -140,7 +140,7 @@ public final class PersistenceServiceTest {
         QuerySpecification querySpecification = mock(QuerySpecification.class);
 
         DetachedCriteria criteria = mock(DetachedCriteria.class);
-        when(translator.translateSpecification(querySpecification)).thenReturn(criteria);
+        when(translator.translate(querySpecification)).thenReturn(criteria);
 
         List itemInList = Collections.emptyList();
 
@@ -158,7 +158,7 @@ public final class PersistenceServiceTest {
         QuerySpecification querySpecification = mock(QuerySpecification.class);
 
         DetachedCriteria criteria = mock(DetachedCriteria.class);
-        when(translator.translateSpecification(querySpecification)).thenReturn(criteria);
+        when(translator.translate(querySpecification)).thenReturn(criteria);
 
         List itemInList = Arrays.asList(new PersistentObjectStub(), new PersistentObjectStub());
 
@@ -172,7 +172,7 @@ public final class PersistenceServiceTest {
         QuerySpecification querySpecification = mock(QuerySpecification.class);
 
         DetachedCriteria criteria = mock(DetachedCriteria.class);
-        when(translator.translateSpecification(querySpecification)).thenReturn(criteria);
+        when(translator.translate(querySpecification)).thenReturn(criteria);
 
         List itemInList = Collections.emptyList();
 
