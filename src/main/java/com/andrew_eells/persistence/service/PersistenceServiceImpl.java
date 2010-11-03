@@ -8,6 +8,7 @@ import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
     {
         Validate.notNull(querySpecification, "query specification should be non-null!");
 
-        return QuerySpecificationImpl.uniqueElement(readList(querySpecification));
+        return DataAccessUtils.uniqueResult(readList(querySpecification));
     }
 
     @Override public final List<PersistenceStrategy> readList(final QuerySpecification querySpecification)

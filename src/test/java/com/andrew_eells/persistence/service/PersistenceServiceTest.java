@@ -10,6 +10,7 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 import java.util.Arrays;
@@ -172,7 +173,7 @@ public final class PersistenceServiceTest
         assertThat(result, equalTo(null)); // this show that it can return when list is null
     }
 
-    @Test(expected = NonUniqueResultException.class)
+    @Test(expected = IncorrectResultSizeDataAccessException.class)
     public void shouldThrowUniqueExceptionWhenReadUniqueReturnsMoreThanOneResult()
     {
         QuerySpecification querySpecification = mock(QuerySpecification.class);
