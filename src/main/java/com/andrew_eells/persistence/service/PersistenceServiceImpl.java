@@ -4,7 +4,6 @@ package com.andrew_eells.persistence.service;
 
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
-import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import java.util.List;
 public class PersistenceServiceImpl implements PersistenceService<PersistenceStrategy>
 {
     private final HibernateTemplate hibernateTemplate;
+
     private final QuerySpecificationTranslator translator;
 
     @Autowired
@@ -73,6 +73,13 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
 
     private void saveOrUpdate(final PersistenceStrategy model)
     {
-        hibernateTemplate.saveOrUpdate(model);
+        if (hibernateTemplate.contains(model))
+        {
+            hibernateTemplate.merge(model);
+        }
+        else
+        {
+            hibernateTemplate.saveOrUpdate(model);
+        }
     }
 }
