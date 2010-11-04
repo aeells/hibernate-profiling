@@ -1,6 +1,5 @@
 package com.andrew_eells.persistence.infrastructure.model;
 
-import com.andrew_eells.persistence.infrastructure.AbstractPersistentObject;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;

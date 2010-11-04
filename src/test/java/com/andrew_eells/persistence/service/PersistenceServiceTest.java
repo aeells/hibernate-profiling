@@ -2,10 +2,9 @@
 
 package com.andrew_eells.persistence.service;
 
-import com.andrew_eells.persistence.infrastructure.AbstractPersistentObject;
+import com.andrew_eells.persistence.infrastructure.model.AbstractPersistentObject;
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
-import org.hibernate.NonUniqueResultException;
 import org.hibernate.criterion.DetachedCriteria;
 import org.junit.Before;
 import org.junit.Test;

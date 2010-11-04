@@ -19,11 +19,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring-test-context.xml"})
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-@Transactional
-public class PersistenceServiceITest {
+@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {"classpath:spring-test-context.xml"})
+@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true) @Transactional
+public class PersistenceServiceITest
+{
     @Autowired
     private PersistenceService service;
 
@@ -31,7 +30,8 @@ public class PersistenceServiceITest {
     private SessionFactory sessionFactory;
 
     @Test
-    public void shouldSaveEntity() {
+    public void shouldSaveEntity()
+    {
         Parent parent = new Parent(1);
 
         persistAndEvict(parent);
@@ -43,7 +43,8 @@ public class PersistenceServiceITest {
     }
 
     @Test
-    public void shouldSaveAssociatedEntity() {
+    public void shouldSaveAssociatedEntity()
+    {
         Parent parent = createFullGraphPersistAndEvict();
 
         final Parent loadedParent = (Parent) service.readUnique(new QuerySpecificationImpl(Parent.class, new QueryClause("id", parent.getId(), QueryClauseOperator.EQ)));
@@ -52,7 +53,8 @@ public class PersistenceServiceITest {
     }
 
     @Test
-    public void shouldPersistEntityAndThenAddAssociateObject() {
+    public void shouldPersistEntityAndThenAddAssociateObject()
+    {
         Parent parent = new Parent(1);
 
         persistAndEvict(parent);
@@ -68,7 +70,8 @@ public class PersistenceServiceITest {
         fullyAssertObjectGraph(parent, loadedParent);
     }
 
-    private void fullyAssertObjectGraph(final Parent parent, final Parent loadedParent) {
+    private void fullyAssertObjectGraph(final Parent parent, final Parent loadedParent)
+    {
         assertThat(parent.getId(), notNullValue());
 
         assertThat(parent.getChildren().get(0), notNullValue());
@@ -78,7 +81,8 @@ public class PersistenceServiceITest {
         assertThat(loadedParent.getChildren(), CollectionMatcher.containsOnly(parent.getChildren()));
     }
 
-    private Parent createFullGraphPersistAndEvict() {
+    private Parent createFullGraphPersistAndEvict()
+    {
         Parent parent = new Parent(1);
         Child child = new Child(1, parent);
 
@@ -89,7 +93,8 @@ public class PersistenceServiceITest {
         return parent;
     }
 
-    private void persistAndEvict(final Parent parent) {
+    private void persistAndEvict(final Parent parent)
+    {
         service.create(parent);
 
         sessionFactory.getCurrentSession().flush();
