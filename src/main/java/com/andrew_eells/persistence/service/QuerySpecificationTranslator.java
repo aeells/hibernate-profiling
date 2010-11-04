@@ -1,9 +1,6 @@
 package com.andrew_eells.persistence.service;
 
-import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
-import com.andrew_eells.persistence.infrastructure.query.QueryKeyInfo;
-import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
-import com.andrew_eells.persistence.infrastructure.query.SortKeyInfo;
+import com.andrew_eells.persistence.infrastructure.query.*;
 import org.hibernate.criterion.*;
 
 import java.util.Map;
