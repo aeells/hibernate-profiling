@@ -38,7 +38,6 @@ public interface PersistenceService<PersistentStrategy>
      * Update existing object.
      *
      * @param object Object to be updated.
-     * @return Updated object.
      */
     void update(final PersistentStrategy object);
 
