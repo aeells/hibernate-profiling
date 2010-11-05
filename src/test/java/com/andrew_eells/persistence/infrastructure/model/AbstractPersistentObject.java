@@ -74,7 +74,6 @@ public abstract class AbstractPersistentObject implements PersistenceStrategy
         return true;
     }
 
-    @Override
     public void setLastModified(final DateTime lastModified)
     {
         this.lastModified = lastModified;

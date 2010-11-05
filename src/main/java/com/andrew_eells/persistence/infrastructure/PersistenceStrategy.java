@@ -2,8 +2,6 @@
 
 package com.andrew_eells.persistence.infrastructure;
 
-import org.joda.time.DateTime;
-
 /**
  * Persistence strategy.
  */
@@ -29,10 +27,4 @@ public interface PersistenceStrategy
      * @return <code>true</code> if the implementation should be deleted; <code>false</code> otherwise.
      */
     boolean isDeletable();
-
-    /**
-     * Sets the last modified time.
-     * @param time the time the implementation was last modified.
-     */
-    void setLastModified(DateTime time);
 }

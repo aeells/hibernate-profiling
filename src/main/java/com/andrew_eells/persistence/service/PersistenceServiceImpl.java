@@ -5,7 +5,6 @@ package com.andrew_eells.persistence.service;
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
 import org.apache.commons.lang.Validate;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -43,8 +42,6 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
     {
         if (model != null && model.isUpdateable())
         {
-            model.setLastModified(new DateTime());
-
             saveOrUpdate(model);
         }
     }
