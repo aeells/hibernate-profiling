@@ -136,20 +136,6 @@ public class QuerySpecificationImpl implements QuerySpecification {
         return fields;
     }
 
-    public static <T> T uniqueElement(List<T> list) throws NonUniqueResultException {
-        int size = list.size();
-        if (size == 0) {
-            return null;
-        }
-        T first = list.get(0);
-        for (int i = 1; i < size; i++) {
-            if (list.get(i) != first) {
-                throw new NonUniqueResultException(list.size());
-            }
-        }
-        return first;
-    }
-
     @Override
     public QuerySpecificationOperator getQueryOperator() {
         return queryOperator;
