@@ -45,10 +45,10 @@ public final class QueryType
     /**
      * Indicates query based on customer phone number.
      */
-    public static final String PHONE_NUMBER_PRIMARY = "phoneNumberPrimary";
+    public static final String PRIMARY_PHONE_NUMBER = "primaryPhoneNumber";
 
     /**
      * Indicates query based on customer phone number 2.
      */
-    public static final String PHONE_NUMBER_SECONDARY = "phoneNumberSecondary";
+    public static final String SECONDARY_PHONE_NUMBER = "secondaryPhoneNumber";
 }
