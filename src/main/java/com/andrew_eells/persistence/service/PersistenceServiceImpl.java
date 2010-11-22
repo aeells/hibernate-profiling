@@ -65,6 +65,7 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
     {
         Validate.notNull(querySpecification, "query specification should be non-null!");
 
+        //noinspection unchecked
         return hibernateTemplate.findByCriteria(translator.translate(querySpecification));
     }
 

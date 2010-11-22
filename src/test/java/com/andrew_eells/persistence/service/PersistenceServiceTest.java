@@ -16,8 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -169,7 +168,7 @@ public final class PersistenceServiceTest
 
         verify(hibernateTemplate).findByCriteria(criteria);
 
-        assertThat(result, equalTo(null)); // this show that it can return when list is null
+        assertNull(result); // this show that it can return when list is null
     }
 
     @Test(expected = IncorrectResultSizeDataAccessException.class)
@@ -195,11 +194,11 @@ public final class PersistenceServiceTest
         DetachedCriteria criteria = mock(DetachedCriteria.class);
         when(translator.translate(querySpecification)).thenReturn(criteria);
 
-        List itemInList = Collections.emptyList();
+        final List itemInList = Collections.emptyList();
 
         when(hibernateTemplate.findByCriteria(criteria)).thenReturn(itemInList);
 
-        List<PersistenceStrategy> result = persistenceService.readList(querySpecification);
+        persistenceService.readList(querySpecification);
 
         verify(hibernateTemplate).findByCriteria(criteria);
     }

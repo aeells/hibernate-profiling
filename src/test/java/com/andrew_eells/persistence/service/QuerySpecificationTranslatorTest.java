@@ -1,11 +1,22 @@
 package com.andrew_eells.persistence.service;
 
 import com.andrew_eells.persistence.infrastructure.model.AbstractPersistentObject;
-import com.andrew_eells.persistence.infrastructure.query.*;
+import com.andrew_eells.persistence.infrastructure.query.QueryClause;
+import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
+import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
+import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
+import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationOperator;
+import com.andrew_eells.persistence.infrastructure.query.QueryType;
+import com.andrew_eells.persistence.infrastructure.query.Queryable;
+import com.andrew_eells.persistence.infrastructure.query.SortKeyInfo;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.impl.CriteriaImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,23 +30,29 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 /**
- * The tests are based on toString signatures because Hibernate doesn't implement
- * hashcode/equals, but does implement toString on their objects.
+ * The tests are based on toString signatures because Hibernate doesn't implement hashcode/equals, but does implement toString on their objects.
  */
-public class QuerySpecificationTranslatorTest {
+public class QuerySpecificationTranslatorTest
+{
     private QuerySpecificationTranslator translator;
+
     private static final String CUSTOMER_ID = "12345678";
+
     private static final String CUSTOMER_EMAIL = "firstname.lastname@andrew-eells.com";
+
     private static final Order NO_ORDER = null;
+
     private static final SortKeyInfo NO_SORT = null;
 
     @Before
-    public void context() {
+    public void context()
+    {
         translator = new QuerySpecificationTranslator();
     }
 
     @Test
-    public void shouldTranslateEntityClassThroughToCriteria() {
+    public void shouldTranslateEntityClassThroughToCriteria()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionWith(NO_SORT);
 
@@ -50,7 +67,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceCriteriaBasedOnEqualsOperator() {
+    public void shouldProduceCriteriaBasedOnEqualsOperator()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionWith(NO_SORT);
 
@@ -62,7 +80,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceCriteriaBasedOnAndOperator() {
+    public void shouldProduceCriteriaBasedOnAndOperator()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = multipleFieldPreConditionsWith(QuerySpecificationOperator.AND);
 
@@ -77,7 +96,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceCriteriaBasedOnOrOperator() {
+    public void shouldProduceCriteriaBasedOnOrOperator()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = multipleFieldPreConditionsWith(QuerySpecificationOperator.OR);
 
@@ -89,7 +109,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceACriteriaBasedOnGreaterThanOperator() {
+    public void shouldProduceACriteriaBasedOnGreaterThanOperator()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionBasedOn(QueryClauseOperator.GT);
 
@@ -101,7 +122,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceACriteriaBasedOnLessThanOperator() {
+    public void shouldProduceACriteriaBasedOnLessThanOperator()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionBasedOn(QueryClauseOperator.LT);
 
@@ -113,7 +135,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceACriteriaBasedOnNotEqualOperator() {
+    public void shouldProduceACriteriaBasedOnNotEqualOperator()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionBasedOn(QueryClauseOperator.NOT_EQ);
 
@@ -125,7 +148,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceACriteriaBasedOnGreaterThanEqualOperator() {
+    public void shouldProduceACriteriaBasedOnGreaterThanEqualOperator()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionBasedOn(QueryClauseOperator.GT_OR_EQ);
 
@@ -137,7 +161,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceACriteriaBasedOnLessThanEqualOperator() {
+    public void shouldProduceACriteriaBasedOnLessThanEqualOperator()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionBasedOn(QueryClauseOperator.LT_OR_EQ);
 
@@ -148,7 +173,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceACriteriaWithAscendingOrder() {
+    public void shouldProduceACriteriaWithAscendingOrder()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionWith(SortKeyInfo.ascending(QueryType.CUSTOMER_ID));
 
@@ -163,7 +189,8 @@ public class QuerySpecificationTranslatorTest {
     }
 
     @Test
-    public void shouldProduceACriteriaWithDescendingOrder() {
+    public void shouldProduceACriteriaWithDescendingOrder()
+    {
         // preConditions
         DetachedCriteria actualDetachedCriteria = singleFieldPreConditionWith(SortKeyInfo.descending(QueryType.CUSTOMER_ID));
 
@@ -177,7 +204,8 @@ public class QuerySpecificationTranslatorTest {
         assertThat(actualCriteria.iterateOrderings(), hasSameToStringSignatureOf(expectedCriteria.iterateOrderings()));
     }
 
-    private void callClassAndAssert(DetachedCriteria actualDetachedCriteria, CriteriaImpl expectedCriteria) {
+    private void callClassAndAssert(DetachedCriteria actualDetachedCriteria, CriteriaImpl expectedCriteria)
+    {
         // call
         CriteriaImpl actualCriteria = (CriteriaImpl) actualDetachedCriteria.getExecutableCriteria(null);
 
@@ -185,24 +213,33 @@ public class QuerySpecificationTranslatorTest {
         assertThat(actualCriteria.iterateExpressionEntries(), hasSameToStringSignatureOf(expectedCriteria.iterateExpressionEntries()));
     }
 
-    private DetachedCriteria singleFieldPreConditionBasedOn(QueryClauseOperator operator) {
-        QuerySpecification querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class, new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, operator));
+    private DetachedCriteria singleFieldPreConditionBasedOn(QueryClauseOperator operator)
+    {
+        QuerySpecification querySpecification =
+                new QuerySpecificationImpl(PersistentObjectStub.class, new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, operator));
 
         return translator.translate(querySpecification);
     }
 
-    private DetachedCriteria singleFieldPreConditionWith(SortKeyInfo sortKeyInfo) {
+    private DetachedCriteria singleFieldPreConditionWith(SortKeyInfo sortKeyInfo)
+    {
         QuerySpecification querySpecification;
-        if (sortKeyInfo != null) {
-            querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class, new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, QueryClauseOperator.EQ), sortKeyInfo);
-        } else {
-            querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class, new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, QueryClauseOperator.EQ));
+        if (sortKeyInfo != null)
+        {
+            querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class,
+                                                            new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, QueryClauseOperator.EQ), sortKeyInfo);
+        }
+        else
+        {
+            querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class,
+                                                            new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, QueryClauseOperator.EQ));
         }
 
         return translator.translate(querySpecification);
     }
 
-    private DetachedCriteria multipleFieldPreConditionsWith(QuerySpecificationOperator querySpecificationOperator) {
+    private DetachedCriteria multipleFieldPreConditionsWith(QuerySpecificationOperator querySpecificationOperator)
+    {
         QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, QueryClauseOperator.EQ);
         QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, CUSTOMER_EMAIL, QueryClauseOperator.EQ);
         List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
@@ -212,60 +249,73 @@ public class QuerySpecificationTranslatorTest {
         return actualDetachedCriteria;
     }
 
-    private CriteriaImpl singleFieldDetachedCriteriaWith(Order order, SimpleExpression expression) {
+    private CriteriaImpl singleFieldDetachedCriteriaWith(Order order, SimpleExpression expression)
+    {
         DetachedCriteria expectedDetachedCriteria = DetachedCriteria.forEntityName(PersistentObjectStub.class.getName());
         expectedDetachedCriteria.add(expression);
         CriteriaImpl expectedCriteria = (CriteriaImpl) expectedDetachedCriteria.getExecutableCriteria(null);
 
-        if (order != null) {
+        if (order != null)
+        {
             expectedCriteria.addOrder(order);
         }
 
         return expectedCriteria;
     }
 
-    private CriteriaImpl singleFieldDetachedCriteriaBasedOnEqualsWith(Order order) {
+    private CriteriaImpl singleFieldDetachedCriteriaBasedOnEqualsWith(Order order)
+    {
         return singleFieldDetachedCriteriaWith(order, Restrictions.eq(QueryType.CUSTOMER_ID, CUSTOMER_ID));
     }
 
-    private CriteriaImpl singleFieldDetachedCriteriaBasedOnGreaterThan() {
+    private CriteriaImpl singleFieldDetachedCriteriaBasedOnGreaterThan()
+    {
         return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.gt(QueryType.CUSTOMER_ID, CUSTOMER_ID));
     }
 
-    private CriteriaImpl singleFieldDetachedCriteriaBasedOnLessThan() {
+    private CriteriaImpl singleFieldDetachedCriteriaBasedOnLessThan()
+    {
         return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.lt(QueryType.CUSTOMER_ID, CUSTOMER_ID));
     }
 
-    private CriteriaImpl singleFieldDetachedCriteriaBasedOnNotEqual() {
+    private CriteriaImpl singleFieldDetachedCriteriaBasedOnNotEqual()
+    {
         return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.ne(QueryType.CUSTOMER_ID, CUSTOMER_ID));
     }
 
-    private CriteriaImpl singleFieldDetachedCriteriaBasedOnLessOrEqualTo() {
+    private CriteriaImpl singleFieldDetachedCriteriaBasedOnLessOrEqualTo()
+    {
         return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.le(QueryType.CUSTOMER_ID, CUSTOMER_ID));
     }
 
-    private CriteriaImpl singleFieldDetachedCriteriaBasedOnGreaterOrEqualTo() {
+    private CriteriaImpl singleFieldDetachedCriteriaBasedOnGreaterOrEqualTo()
+    {
         return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.ge(QueryType.CUSTOMER_ID, CUSTOMER_ID));
     }
 
-    private CriteriaImpl multipleFieldDetachedCriteriaBasedOnOrCondition() {
+    private CriteriaImpl multipleFieldDetachedCriteriaBasedOnOrCondition()
+    {
         DetachedCriteria expectedDetachedCriteria = DetachedCriteria.forEntityName(PersistentObjectStub.class.getName());
         final Disjunction disjunction = Restrictions.disjunction();
         disjunction.add(Restrictions.eq(QueryType.CUSTOMER_ID, CUSTOMER_ID));
         disjunction.add(Restrictions.eq(QueryType.EMAIL_ADDRESS, CUSTOMER_EMAIL));
         expectedDetachedCriteria.add(disjunction);
-        CriteriaImpl expectedCriteria = (CriteriaImpl) expectedDetachedCriteria.getExecutableCriteria(null);
-        return expectedCriteria;
+
+        return (CriteriaImpl) expectedDetachedCriteria.getExecutableCriteria(null);
     }
 
-    private Matcher<Iterator> hasSameToStringSignatureOf(final Iterator expected) {
+    private Matcher<Iterator> hasSameToStringSignatureOf(final Iterator expected)
+    {
 
-        return new BaseMatcher<Iterator>() {
+        return new BaseMatcher<Iterator>()
+        {
             private List actualList;
+
             private List expectedList;
 
             @Override
-            public boolean matches(Object actual) {
+            public boolean matches(Object actual)
+            {
 
                 actualList = createListFrom((Iterator) actual);
                 expectedList = createListFrom(expected);
@@ -274,7 +324,8 @@ public class QuerySpecificationTranslatorTest {
             }
 
             @Override
-            public void describeTo(Description description) {
+            public void describeTo(Description description)
+            {
 
                 description.appendText("The toString of ");
                 description.appendValue(actualList);
@@ -282,18 +333,21 @@ public class QuerySpecificationTranslatorTest {
                 description.appendValue(expectedList);
             }
 
-            private List createListFrom(Iterator iterator) {
-
-                List result = new ArrayList();
+            private List createListFrom(Iterator iterator)
+            {
+                final List result = new ArrayList();
                 while (iterator.hasNext())
+                {
                     result.add(iterator.next());
+                }
 
                 return result;
             }
         };
     }
 
-    class PersistentObjectStub extends AbstractPersistentObject {
+    class PersistentObjectStub extends AbstractPersistentObject
+    {
         @Queryable(value = QueryType.CUSTOMER_ID, isCaseSensitive = true)
         public String customerId;
 
@@ -305,6 +359,5 @@ public class QuerySpecificationTranslatorTest {
         public boolean update;
 
         public boolean delete;
-
     }
 }
