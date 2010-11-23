@@ -205,7 +205,6 @@ public final class PersistenceServiceTest
 
     private class PersistentObjectStub extends AbstractPersistentObject
     {
-
         public boolean create;
 
         public boolean update;

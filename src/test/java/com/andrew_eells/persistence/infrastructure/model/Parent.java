@@ -22,8 +22,10 @@ public class Parent extends AbstractPersistentObject
     @OneToMany(mappedBy = "parent", fetch = LAZY, cascade = {ALL})
     private List<Child> children = new ArrayList<Child>();
 
-    public Parent() {}
-    
+    public Parent()
+    {
+    }
+
     public Parent(final int version)
     {
         super.setVersion(version);
@@ -37,21 +39,6 @@ public class Parent extends AbstractPersistentObject
     public List<Child> getChildren()
     {
         return Collections.unmodifiableList(this.children);
-    }
-
-    @Override public boolean isCreatable()
-    {
-        return true;
-    }
-
-    @Override public boolean isUpdateable()
-    {
-        return true;
-    }
-
-    @Override public boolean isDeletable()
-    {
-        return true;
     }
 
     @Override

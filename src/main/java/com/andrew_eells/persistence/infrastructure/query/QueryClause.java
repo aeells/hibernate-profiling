@@ -9,18 +9,13 @@ public class QueryClause
 
     private Object fieldValue;
 
-    private QueryClauseOperator operator = null;
+    private QueryClauseOperator operator;
 
-    public QueryClause(final String fieldName, final Object fieldValue, final QueryClauseOperator operator)
+    public QueryClause(final QueryType queryType, final Object fieldValue, final QueryClauseOperator operator)
     {
-        this.fieldName = fieldName;
+        this.fieldName = queryType.getFieldName();
         this.fieldValue = fieldValue;
         this.operator = operator;
-    }
-
-    public QueryClauseOperator getOperator()
-    {
-        return operator;
     }
 
     public String getFieldName()
@@ -31,5 +26,10 @@ public class QueryClause
     public Object getFieldValue()
     {
         return fieldValue;
+    }
+
+    public QueryClauseOperator getOperator()
+    {
+        return operator;
     }
 }

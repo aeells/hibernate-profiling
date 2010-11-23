@@ -6,7 +6,7 @@ import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationOperator;
-import com.andrew_eells.persistence.infrastructure.query.QueryType;
+import com.andrew_eells.persistence.infrastructure.query.QueryTypeImpl;
 import com.andrew_eells.persistence.infrastructure.query.Queryable;
 import com.andrew_eells.persistence.infrastructure.query.SortKeyInfo;
 import org.hamcrest.BaseMatcher;
@@ -87,8 +87,8 @@ public class QuerySpecificationTranslatorTest
 
         // expected value
         DetachedCriteria expectedDetachedCriteria = DetachedCriteria.forEntityName(PersistentObjectStub.class.getName());
-        expectedDetachedCriteria.add(Restrictions.eq(QueryType.CUSTOMER_ID, CUSTOMER_ID));
-        expectedDetachedCriteria.add(Restrictions.eq(QueryType.EMAIL_ADDRESS, CUSTOMER_EMAIL));
+        expectedDetachedCriteria.add(Restrictions.eq(QueryTypeImpl.CUSTOMER_QUERY.getFieldName(), CUSTOMER_ID));
+        expectedDetachedCriteria.add(Restrictions.eq(QueryTypeImpl.EMAIL_ADDRESS_QUERY.getFieldName(), CUSTOMER_EMAIL));
         CriteriaImpl expectedCriteria = (CriteriaImpl) expectedDetachedCriteria.getExecutableCriteria(null);
 
         // call
@@ -176,10 +176,10 @@ public class QuerySpecificationTranslatorTest
     public void shouldProduceACriteriaWithAscendingOrder()
     {
         // preConditions
-        DetachedCriteria actualDetachedCriteria = singleFieldPreConditionWith(SortKeyInfo.ascending(QueryType.CUSTOMER_ID));
+        DetachedCriteria actualDetachedCriteria = singleFieldPreConditionWith(SortKeyInfo.ascending(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()));
 
         // expected value
-        CriteriaImpl expectedCriteria = singleFieldDetachedCriteriaBasedOnEqualsWith(Order.asc(QueryType.CUSTOMER_ID));
+        CriteriaImpl expectedCriteria = singleFieldDetachedCriteriaBasedOnEqualsWith(Order.asc(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()));
 
         // call
         CriteriaImpl actualCriteria = (CriteriaImpl) actualDetachedCriteria.getExecutableCriteria(null);
@@ -192,10 +192,10 @@ public class QuerySpecificationTranslatorTest
     public void shouldProduceACriteriaWithDescendingOrder()
     {
         // preConditions
-        DetachedCriteria actualDetachedCriteria = singleFieldPreConditionWith(SortKeyInfo.descending(QueryType.CUSTOMER_ID));
+        DetachedCriteria actualDetachedCriteria = singleFieldPreConditionWith(SortKeyInfo.descending(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()));
 
         // expected value
-        CriteriaImpl expectedCriteria = singleFieldDetachedCriteriaBasedOnEqualsWith(Order.desc(QueryType.CUSTOMER_ID));
+        CriteriaImpl expectedCriteria = singleFieldDetachedCriteriaBasedOnEqualsWith(Order.desc(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()));
 
         // call
         CriteriaImpl actualCriteria = (CriteriaImpl) actualDetachedCriteria.getExecutableCriteria(null);
@@ -216,7 +216,7 @@ public class QuerySpecificationTranslatorTest
     private DetachedCriteria singleFieldPreConditionBasedOn(QueryClauseOperator operator)
     {
         QuerySpecification querySpecification =
-                new QuerySpecificationImpl(PersistentObjectStub.class, new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, operator));
+                new QuerySpecificationImpl(PersistentObjectStub.class, new QueryClause(QueryTypeImpl.CUSTOMER_QUERY, CUSTOMER_ID, operator));
 
         return translator.translate(querySpecification);
     }
@@ -227,12 +227,12 @@ public class QuerySpecificationTranslatorTest
         if (sortKeyInfo != null)
         {
             querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class,
-                                                            new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, QueryClauseOperator.EQ), sortKeyInfo);
+                                                            new QueryClause(QueryTypeImpl.CUSTOMER_QUERY, CUSTOMER_ID, QueryClauseOperator.EQ), sortKeyInfo);
         }
         else
         {
             querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class,
-                                                            new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, QueryClauseOperator.EQ));
+                                                            new QueryClause(QueryTypeImpl.CUSTOMER_QUERY, CUSTOMER_ID, QueryClauseOperator.EQ));
         }
 
         return translator.translate(querySpecification);
@@ -240,13 +240,13 @@ public class QuerySpecificationTranslatorTest
 
     private DetachedCriteria multipleFieldPreConditionsWith(QuerySpecificationOperator querySpecificationOperator)
     {
-        QueryClause nameQueryClause = new QueryClause(QueryType.CUSTOMER_ID, CUSTOMER_ID, QueryClauseOperator.EQ);
-        QueryClause emailQueryClause = new QueryClause(QueryType.EMAIL_ADDRESS, CUSTOMER_EMAIL, QueryClauseOperator.EQ);
-        List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
+        final QueryClause nameQueryClause = new QueryClause(QueryTypeImpl.CUSTOMER_QUERY, CUSTOMER_ID, QueryClauseOperator.EQ);
+        final QueryClause emailQueryClause = new QueryClause(QueryTypeImpl.EMAIL_ADDRESS_QUERY, CUSTOMER_EMAIL, QueryClauseOperator.EQ);
+        final List<QueryClause> queryClauses = Arrays.asList(nameQueryClause, emailQueryClause);
 
-        QuerySpecification querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class, queryClauses, querySpecificationOperator);
-        DetachedCriteria actualDetachedCriteria = translator.translate(querySpecification);
-        return actualDetachedCriteria;
+        final QuerySpecification querySpecification = new QuerySpecificationImpl(PersistentObjectStub.class, queryClauses, querySpecificationOperator);
+
+        return translator.translate(querySpecification);
     }
 
     private CriteriaImpl singleFieldDetachedCriteriaWith(Order order, SimpleExpression expression)
@@ -265,40 +265,40 @@ public class QuerySpecificationTranslatorTest
 
     private CriteriaImpl singleFieldDetachedCriteriaBasedOnEqualsWith(Order order)
     {
-        return singleFieldDetachedCriteriaWith(order, Restrictions.eq(QueryType.CUSTOMER_ID, CUSTOMER_ID));
+        return singleFieldDetachedCriteriaWith(order, Restrictions.eq(QueryTypeImpl.CUSTOMER_QUERY.getFieldName(), CUSTOMER_ID));
     }
 
     private CriteriaImpl singleFieldDetachedCriteriaBasedOnGreaterThan()
     {
-        return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.gt(QueryType.CUSTOMER_ID, CUSTOMER_ID));
+        return singleFieldDetachedCriteriaWith(Order.desc(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()), Restrictions.gt(QueryTypeImpl.CUSTOMER_QUERY.getFieldName(), CUSTOMER_ID));
     }
 
     private CriteriaImpl singleFieldDetachedCriteriaBasedOnLessThan()
     {
-        return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.lt(QueryType.CUSTOMER_ID, CUSTOMER_ID));
+        return singleFieldDetachedCriteriaWith(Order.desc(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()), Restrictions.lt(QueryTypeImpl.CUSTOMER_QUERY.getFieldName(), CUSTOMER_ID));
     }
 
     private CriteriaImpl singleFieldDetachedCriteriaBasedOnNotEqual()
     {
-        return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.ne(QueryType.CUSTOMER_ID, CUSTOMER_ID));
+        return singleFieldDetachedCriteriaWith(Order.desc(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()), Restrictions.ne(QueryTypeImpl.CUSTOMER_QUERY.getFieldName(), CUSTOMER_ID));
     }
 
     private CriteriaImpl singleFieldDetachedCriteriaBasedOnLessOrEqualTo()
     {
-        return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.le(QueryType.CUSTOMER_ID, CUSTOMER_ID));
+        return singleFieldDetachedCriteriaWith(Order.desc(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()), Restrictions.le(QueryTypeImpl.CUSTOMER_QUERY.getFieldName(), CUSTOMER_ID));
     }
 
     private CriteriaImpl singleFieldDetachedCriteriaBasedOnGreaterOrEqualTo()
     {
-        return singleFieldDetachedCriteriaWith(Order.desc(QueryType.CUSTOMER_ID), Restrictions.ge(QueryType.CUSTOMER_ID, CUSTOMER_ID));
+        return singleFieldDetachedCriteriaWith(Order.desc(QueryTypeImpl.CUSTOMER_QUERY.getFieldName()), Restrictions.ge(QueryTypeImpl.CUSTOMER_QUERY.getFieldName(), CUSTOMER_ID));
     }
 
     private CriteriaImpl multipleFieldDetachedCriteriaBasedOnOrCondition()
     {
         DetachedCriteria expectedDetachedCriteria = DetachedCriteria.forEntityName(PersistentObjectStub.class.getName());
         final Disjunction disjunction = Restrictions.disjunction();
-        disjunction.add(Restrictions.eq(QueryType.CUSTOMER_ID, CUSTOMER_ID));
-        disjunction.add(Restrictions.eq(QueryType.EMAIL_ADDRESS, CUSTOMER_EMAIL));
+        disjunction.add(Restrictions.eq(QueryTypeImpl.CUSTOMER_QUERY.getFieldName(), CUSTOMER_ID));
+        disjunction.add(Restrictions.eq(QueryTypeImpl.EMAIL_ADDRESS_QUERY.getFieldName(), CUSTOMER_EMAIL));
         expectedDetachedCriteria.add(disjunction);
 
         return (CriteriaImpl) expectedDetachedCriteria.getExecutableCriteria(null);
@@ -338,6 +338,7 @@ public class QuerySpecificationTranslatorTest
                 final List result = new ArrayList();
                 while (iterator.hasNext())
                 {
+                    //noinspection unchecked
                     result.add(iterator.next());
                 }
 
@@ -348,16 +349,13 @@ public class QuerySpecificationTranslatorTest
 
     class PersistentObjectStub extends AbstractPersistentObject
     {
-        @Queryable(value = QueryType.CUSTOMER_ID, isCaseSensitive = true)
+        @Queryable(value = QueryTypeImpl.PK_ID, isCaseSensitive = true)
+        public String id;
+
+        @Queryable(value = QueryTypeImpl.CUSTOMER_ID, isCaseSensitive = true)
         public String customerId;
 
-        @Queryable(value = QueryType.EMAIL_ADDRESS, isCaseSensitive = false)
+        @Queryable(value = QueryTypeImpl.EMAIL_ADDRESS, isCaseSensitive = false)
         public String email;
-
-        public boolean create;
-
-        public boolean update;
-
-        public boolean delete;
     }
 }

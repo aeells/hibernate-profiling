@@ -3,8 +3,8 @@ package com.andrew_eells.persistence.service;
 import com.andrew_eells.persistence.infrastructure.model.Child;
 import com.andrew_eells.persistence.infrastructure.model.Parent;
 import com.andrew_eells.persistence.infrastructure.query.QueryClause;
-import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
+import com.andrew_eells.persistence.infrastructure.query.QueryTypeImpl;
 import com.qmetric.hamcrest.matchers.CollectionMatcher;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator.EQ;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -24,7 +25,7 @@ import static org.junit.Assert.assertThat;
 public class PersistenceServiceITest
 {
     @Autowired
-    private PersistenceService service;
+    private PersistenceService<Parent> service;
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -32,11 +33,10 @@ public class PersistenceServiceITest
     @Test
     public void shouldSaveEntity()
     {
-        Parent parent = new Parent(1);
-
+        final Parent parent = new Parent(1);
         persistAndEvict(parent);
 
-        final Parent loadedParent = (Parent) service.readUnique(new QuerySpecificationImpl(Parent.class, new QueryClause("id", parent.getId(), QueryClauseOperator.EQ)));
+        final Parent loadedParent = service.readUnique(new QuerySpecificationImpl(Parent.class, new QueryClause(QueryTypeImpl.PK_QUERY, parent.getId(), EQ)));
 
         assertThat(parent.getId(), notNullValue());
         assertThat(loadedParent, equalTo(parent));
@@ -45,9 +45,23 @@ public class PersistenceServiceITest
     @Test
     public void shouldSaveAssociatedEntity()
     {
-        Parent parent = createFullGraphPersistAndEvict();
+        final Parent parent = new Parent(1);
+        parent.addChild(new Child(1, parent));
+        persistAndEvict(parent);
 
-        final Parent loadedParent = (Parent) service.readUnique(new QuerySpecificationImpl(Parent.class, new QueryClause("id", parent.getId(), QueryClauseOperator.EQ)));
+        final Parent loadedParent = service.readUnique(new QuerySpecificationImpl(Parent.class, new QueryClause(QueryTypeImpl.PK_QUERY, parent.getId(), EQ)));
+
+        fullyAssertObjectGraph(parent, loadedParent);
+    }
+
+    @Test
+    public void shouldSaveAssociatedEntityUsingForeignKeyClause()
+    {
+        final Parent parent = new Parent(1);
+        parent.addChild(new Child(1, parent));
+        persistAndEvict(parent);
+
+        final Parent loadedParent = service.readUnique(new QuerySpecificationImpl(Parent.class, new QueryClause(QueryTypeImpl.PK_QUERY, parent.getId(), EQ)));
 
         fullyAssertObjectGraph(parent, loadedParent);
     }
@@ -55,17 +69,13 @@ public class PersistenceServiceITest
     @Test
     public void shouldPersistEntityAndThenAddAssociateObject()
     {
-        Parent parent = new Parent(1);
-
+        final Parent parent = new Parent(1);
         persistAndEvict(parent);
 
-        Child child = new Child(1, parent);
-
-        parent.addChild(child);
-
+        parent.addChild(new Child(1, parent));
         persistAndEvict(parent);
 
-        final Parent loadedParent = (Parent) service.readUnique(new QuerySpecificationImpl(Parent.class, new QueryClause("id", parent.getId(), QueryClauseOperator.EQ)));
+        final Parent loadedParent = service.readUnique(new QuerySpecificationImpl(Parent.class, new QueryClause(QueryTypeImpl.PK_QUERY, parent.getId(), EQ)));
 
         fullyAssertObjectGraph(parent, loadedParent);
     }
@@ -73,24 +83,9 @@ public class PersistenceServiceITest
     private void fullyAssertObjectGraph(final Parent parent, final Parent loadedParent)
     {
         assertThat(parent.getId(), notNullValue());
-
         assertThat(parent.getChildren().get(0), notNullValue());
-
         assertThat(parent.getChildren().get(0).getId(), notNullValue());
-
         assertThat(loadedParent.getChildren(), CollectionMatcher.containsOnly(parent.getChildren()));
-    }
-
-    private Parent createFullGraphPersistAndEvict()
-    {
-        Parent parent = new Parent(1);
-        Child child = new Child(1, parent);
-
-        parent.addChild(child);
-
-        persistAndEvict(parent);
-
-        return parent;
     }
 
     private void persistAndEvict(final Parent parent)

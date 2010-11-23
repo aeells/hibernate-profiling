@@ -18,5 +18,7 @@ public @interface Queryable
 {
     String value();
 
+    QueryableField fieldType() default QueryableField.GENERAL;
+
     boolean isCaseSensitive() default true;
 }

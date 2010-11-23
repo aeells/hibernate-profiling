@@ -24,21 +24,6 @@ public class Child extends AbstractPersistentObject
         this.parent = parent;
     }
 
-    @Override public boolean isCreatable()
-    {
-        return true;
-    }
-
-    @Override public boolean isUpdateable()
-    {
-        return true;
-    }
-
-    @Override public boolean isDeletable()
-    {
-        return true;
-    }
-
     @Override
     public int hashCode()
     {
