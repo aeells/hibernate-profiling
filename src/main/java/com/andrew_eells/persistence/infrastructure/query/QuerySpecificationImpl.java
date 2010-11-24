@@ -113,7 +113,7 @@ public class QuerySpecificationImpl implements QuerySpecification
         // build query params
         for (final QueryClause queryClause : queryClauses)
         {
-            this.queryParams.put(spec(persistentClass, queryClause.getFieldName(), queryClause.getOperator()), queryClause.getFieldValue());
+            this.queryParams.put(spec(persistentClass, queryClause), queryClause.getFieldValue());
         }
     }
 
@@ -121,11 +121,10 @@ public class QuerySpecificationImpl implements QuerySpecification
      * Identifies field name of class to be queried on.
      *
      * @param persistentClass Class of the object to be queried for.
-     * @param type Query type.
-     * @param operator QueryClauseOperator
+     * @param queryClause Query clause.
      * @return Field name.
      */
-    private QueryKeyInfo spec(final Class<? extends PersistenceStrategy> persistentClass, final String type, final QueryClauseOperator operator)
+    private QueryKeyInfo spec(final Class<? extends PersistenceStrategy> persistentClass, final QueryClause queryClause)
     {
         final List<Field> fields = getAllFields(new ArrayList<Field>(), persistentClass);
         for (final Field field : fields)
@@ -133,26 +132,15 @@ public class QuerySpecificationImpl implements QuerySpecification
             if (field.isAnnotationPresent(Queryable.class))
             {
                 final QueryableField fieldType = field.getAnnotation(Queryable.class).fieldType();
-                if (fieldType.equals(QueryableField.PRIMARY_KEY))
+                final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
+                if (fieldType.equals(QueryableField.FOREIGN_KEY) || field.getAnnotation(Queryable.class).value().equals(queryClause.getFieldName()))
                 {
-                    System.out.println("*****");
-                }
-
-                if (fieldType.equals(QueryableField.FOREIGN_KEY))
-                {
-                    System.out.println("*****");
-                }
-
-                // primary key and general are the same, we still have no knowledge of the column name though
-                if (field.getAnnotation(Queryable.class).value().equals(type))
-                {
-                    final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
-                    return new QueryKeyInfo(field.getName(), caseSensitive, operator);
+                    return new QueryKeyInfo(field.getName(), caseSensitive, queryClause.getOperator());
                 }
             }
         }
 
-        throw new IllegalStateException("unable to query class " + persistentClass.getName() + " by type " + type);
+        throw new IllegalStateException("unable to query class " + persistentClass.getName() + " by type " + queryClause.getFieldName());
     }
 
     private List<Field> getAllFields(List<Field> fields, final Class<?> type)
