@@ -9,14 +9,14 @@ import java.util.List;
 /**
  * Standardised database repository access.
  */
-public interface PersistenceService<PersistentStrategy>
+public interface PersistenceService<PersistenceStrategy>
 {
     /**
      * Persist new object.
      *
      * @param object New object.
      */
-    void create(final PersistentStrategy object);
+    void create(final PersistenceStrategy object);
 
     /**
      * Read unique result object.
@@ -24,7 +24,7 @@ public interface PersistenceService<PersistentStrategy>
      * @param querySpecification Query specification.
      * @return Unique result or <code>null</code> if none exists.
      */
-    PersistentStrategy readUnique(final QuerySpecification querySpecification);
+    PersistenceStrategy readUnique(final QuerySpecification querySpecification);
 
     /**
      * Read collection of result objects.
@@ -32,19 +32,19 @@ public interface PersistenceService<PersistentStrategy>
      * @param querySpecification Query specification.
      * @return Collection of results or empty collection if none exists.
      */
-    List<PersistentStrategy> readList(final QuerySpecification querySpecification);
+    List<PersistenceStrategy> readList(final QuerySpecification querySpecification);
 
     /**
      * Update existing object.
      *
      * @param object Object to be updated.
      */
-    void update(final PersistentStrategy object);
+    void update(final PersistenceStrategy object);
 
     /**
      * Delete existing object.
      *
      * @param object Object to be deleted.
      */
-    void delete(final PersistentStrategy object);
+    void delete(final PersistenceStrategy object);
 }
