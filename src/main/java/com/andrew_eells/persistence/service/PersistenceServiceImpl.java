@@ -9,14 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * Standardised database repository access implementation.
  */
-@Service("persistenceService") @Transactional
+@Service("persistenceService")
 public class PersistenceServiceImpl implements PersistenceService<PersistenceStrategy>
 {
     private final HibernateTemplate hibernateTemplate;
