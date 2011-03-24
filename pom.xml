@@ -291,9 +291,9 @@
     </distributionManagement>
 
     <scm>
-        <url>git://github.com/qmg-git/hibernate-persistence-framework.git</url>
-        <connection>scm:git:git://github.com/qmg-git/hibernate-persistence-framework.git</connection>
-        <developerConnection>scm:git:git@github.com:qmg-git/hibernate-persistence-framework.git</developerConnection>
+        <url>git://github.com/aeells/hibernate-persistence-framework.git</url>
+        <connection>scm:git:git://github.com/aeells/hibernate-persistence-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:aeells/hibernate-persistence-framework.git</developerConnection>
     </scm>
 
 </project>
