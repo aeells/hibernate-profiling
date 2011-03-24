@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -78,7 +79,7 @@
         <dependency>
             <groupId>com.qmetric</groupId>
             <artifactId>qmg-testing-utilities</artifactId>
-            <version>1.5</version>
+            <version>1.16</version>
             <scope>test</scope>
         </dependency>
 
@@ -279,20 +280,20 @@
         <snapshotRepository>
             <id>nexus</id>
             <name>qmetric-snapshot</name>
-            <url>https://ec2-79-125-116-182.eu-west-1.compute.amazonaws.com:8443/nexus/content/repositories/qmetric-snapshots</url>
+            <url>http://devbox.local/nexus/content/repositories/qmetric-snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
         <repository>
             <id>nexus</id>
             <name>qmetric-releases</name>
-            <url>https://ec2-79-125-116-182.eu-west-1.compute.amazonaws.com:8443/nexus/content/repositories/qmetric-releases</url>
+            <url>http://devbox.local/nexus/content/repositories/qmetric-releases</url>
         </repository>
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:aeells/hibernate-persistence-framework.git</connection>
-        <url>scm:git:git@github.com:aeells/hibernate-persistence-framework.git</url>
-        <developerConnection>scm:git:git@github.com:aeells/hibernate-persistence-framework.git</developerConnection>
+        <url>git://github.com/qmg-git/hibernate-persistence-framework.git</url>
+        <connection>scm:git:git://github.com/qmg-git/hibernate-persistence-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:qmg-git/hibernate-persistence-framework.git</developerConnection>
     </scm>
 
 </project>
