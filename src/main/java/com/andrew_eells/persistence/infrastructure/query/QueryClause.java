@@ -18,6 +18,12 @@ public class QueryClause
         this.operator = operator;
     }
 
+    public QueryClause(final QueryType queryType, final QueryClauseOperator operator)
+    {
+        this.fieldName = queryType.getFieldName();
+        this.operator = operator;
+    }
+
     public String getFieldName()
     {
         return fieldName;

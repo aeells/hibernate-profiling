@@ -1,11 +1,20 @@
 package com.andrew_eells.persistence.service;
 
-import com.andrew_eells.persistence.infrastructure.query.*;
-import org.hibernate.criterion.*;
+import com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator;
+import com.andrew_eells.persistence.infrastructure.query.QueryKeyInfo;
+import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
+import com.andrew_eells.persistence.infrastructure.query.SortKeyInfo;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
 
 import java.util.Map;
 
-public class QuerySpecificationTranslator {
+public class QuerySpecificationTranslator
+{
 
     public DetachedCriteria translate(final QuerySpecification querySpecification)
     {
@@ -41,11 +50,11 @@ public class QuerySpecificationTranslator {
         {
             final Object value = queryParams.get(keyInfo);
 
-            final SimpleExpression expression = expressionForOperator(keyInfo.getOperator(), keyInfo.getKey(), value);
+            final Criterion expression = expressionForOperator(keyInfo.getOperator(), keyInfo.getKey(), value);
             // ensure value is not null otherwise hibernate will throw an NPE
-            if (value != null && !keyInfo.isCaseSensitive())
+            if (value != null && !keyInfo.isCaseSensitive() && expression instanceof SimpleExpression)
             {
-                expression.ignoreCase();
+                ((SimpleExpression) expression).ignoreCase();
             }
 
             queryCriteria.add(expression);
@@ -62,11 +71,11 @@ public class QuerySpecificationTranslator {
         {
             final Object value = queryParams.get(keyInfo);
 
-            final SimpleExpression expression = expressionForOperator(keyInfo.getOperator(), keyInfo.getKey(), value);
+            final Criterion expression = expressionForOperator(keyInfo.getOperator(), keyInfo.getKey(), value);
             // ensure value is not null otherwise hibernate will throw an NPE
-            if (value != null && !keyInfo.isCaseSensitive())
+            if (value != null && !keyInfo.isCaseSensitive() && expression instanceof SimpleExpression)
             {
-                expression.ignoreCase();
+                ((SimpleExpression) expression).ignoreCase();
             }
 
             disjunction.add(expression);
@@ -77,9 +86,9 @@ public class QuerySpecificationTranslator {
         return queryCriteria;
     }
 
-    private SimpleExpression expressionForOperator(final QueryClauseOperator operator, final String propertyName, final Object value)
+    private Criterion expressionForOperator(final QueryClauseOperator operator, final String propertyName, final Object value)
     {
-        SimpleExpression expression = null;
+        Criterion expression = null;
         switch (operator)
         {
             case EQ:
@@ -99,6 +108,9 @@ public class QuerySpecificationTranslator {
                 break;
             case NOT_EQ:
                 expression = Restrictions.ne(propertyName, value);
+                break;
+            case NOT_NULL:
+                expression = Restrictions.isNotNull(propertyName);
                 break;
         }
 

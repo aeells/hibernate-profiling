@@ -29,9 +29,14 @@ public enum QueryClauseOperator
      * Less than
      */
     LT,
-    
+
     /**
      * Not equal
      */
-    NOT_EQ
+    NOT_EQ,
+
+    /**
+     * Not null
+     */
+    NOT_NULL
 }
