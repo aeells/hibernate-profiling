@@ -5,24 +5,20 @@ package com.andrew_eells.persistence.service;
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
 import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
  * Standardised database repository access implementation.
  */
-@Service("persistenceService")
 public class PersistenceServiceImpl implements PersistenceService<PersistenceStrategy>
 {
     private final HibernateTemplate hibernateTemplate;
 
     private final QuerySpecificationTranslator translator;
 
-    @Autowired
     public PersistenceServiceImpl(final HibernateTemplate hibernateTemplate, final QuerySpecificationTranslator translator)
     {
         this.hibernateTemplate = hibernateTemplate;

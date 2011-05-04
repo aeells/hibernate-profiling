@@ -7,8 +7,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -27,37 +25,38 @@ public abstract class AbstractPersistentObject implements PersistenceStrategy
 
     @Version @Column(nullable = false) @SuppressWarnings({"UnusedDeclaration"})
     private int version;
-
-    @Column(nullable = false) @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
-    private DateTime created = new DateTime();
-
-    @Column(nullable = false, name = "LAST_MODIFIED") @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
-    private DateTime lastModified = new DateTime();
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(final String id)
-    {
-        this.id = id;
-    }
-
-    public DateTime getCreated()
-    {
-        return created;
-    }
-
-    public void setCreated(final DateTime created)
-    {
-        this.created = created;
-    }
-
-    public DateTime getLastModified()
-    {
-        return lastModified;
-    }
+    //
+    //    @Column(nullable = false) @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    //    private DateTime created = new DateTime();
+    //
+    //    @Column(nullable = false, name = "LAST_MODIFIED") @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    //    private DateTime lastModified = new DateTime();
+    //
+        public String getId()
+        {
+            return id;
+        }
+    //
+    //    public void setId(final String id)
+    //    {
+    //        this.id = id;
+    //    }
+    //
+    //    public DateTime getCreated()
+    //    {
+    //        return created;
+    //    }
+    //
+    //    public void setCreated(final DateTime created)
+    //    {
+    //        this.created = created;
+    //    }
+    //
+    //    public DateTime getLastModified()
+    //    {
+    //        return lastModified;
+    //    }
+    //
 
     @Override public boolean isCreatable()
     {
@@ -73,16 +72,12 @@ public abstract class AbstractPersistentObject implements PersistenceStrategy
     {
         return true;
     }
-
-    public void setLastModified(final DateTime lastModified)
-    {
-        this.lastModified = lastModified;
-    }
-
-    public int getVersion()
-    {
-        return version;
-    }
+    //
+    //    public void setLastModified(final DateTime lastModified)
+    //    {
+    //        this.lastModified = lastModified;
+    //    }
+    //
 
     public void setVersion(final int version)
     {
