@@ -3,12 +3,18 @@
 package com.andrew_eells.persistence.service;
 
 import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
+import com.andrew_eells.persistence.infrastructure.query.QueryClause;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
+import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
+import com.andrew_eells.persistence.infrastructure.query.QueryType;
 import org.apache.commons.lang.Validate;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
+import java.io.Serializable;
 import java.util.List;
+
+import static com.andrew_eells.persistence.infrastructure.query.QueryClauseOperator.EQ;
 
 /**
  * Standardised database repository access implementation.
@@ -49,6 +55,16 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         }
     }
 
+    @Override public void flush()
+    {
+        hibernateTemplate.flush();
+    }
+
+    @Override public PersistenceStrategy findById(final Class<? extends PersistenceStrategy> persistentClass, final Serializable id)
+    {
+        return readUnique(new QuerySpecificationImpl(persistentClass, new QueryClause(new PrimaryId(), id, EQ)));
+    }
+
     @Override public final PersistenceStrategy readUnique(final QuerySpecification querySpecification)
     {
         Validate.notNull(querySpecification, "query specification should be non-null!");
@@ -73,6 +89,14 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         else
         {
             hibernateTemplate.saveOrUpdate(model);
+        }
+    }
+
+    private class PrimaryId implements QueryType
+    {
+        @Override public String getFieldName()
+        {
+            return "id";
         }
     }
 }

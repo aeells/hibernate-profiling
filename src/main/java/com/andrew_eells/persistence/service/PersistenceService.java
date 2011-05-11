@@ -2,8 +2,10 @@
 
 package com.andrew_eells.persistence.service;
 
+import com.andrew_eells.persistence.infrastructure.PersistenceStrategy;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecification;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -47,4 +49,8 @@ public interface PersistenceService<PersistenceStrategy>
      * @param object Object to be deleted.
      */
     void delete(final PersistenceStrategy object);
+
+    void flush();
+
+    PersistenceStrategy findById(Class<? extends PersistenceStrategy> persistentClass, Serializable id);
 }
