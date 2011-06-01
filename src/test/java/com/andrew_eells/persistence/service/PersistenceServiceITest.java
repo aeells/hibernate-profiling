@@ -5,7 +5,7 @@ import com.andrew_eells.persistence.infrastructure.model.Parent;
 import com.andrew_eells.persistence.infrastructure.query.QueryClause;
 import com.andrew_eells.persistence.infrastructure.query.QuerySpecificationImpl;
 import com.andrew_eells.persistence.infrastructure.query.QueryTypeImpl;
-import com.qmetric.hamcrest.matchers.CollectionMatcher;
+import com.qmetric.testing.hamcrest.matchers.CollectionMatcher;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
