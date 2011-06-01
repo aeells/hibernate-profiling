@@ -18,7 +18,6 @@
         <hibernate-annotations.version>3.4.0.GA</hibernate-annotations.version>
         <hibernate-core.version>3.3.2.GA</hibernate-core.version>
         <log4j.version>1.2.15</log4j.version>
-        <!-- todo aeells - if we can merge the profiling interceptors we should be able to remove dependency on qmg-utilities -->
         <qmetric.qmg-utilities.testing.version>1.37</qmetric.qmg-utilities.testing.version>
         <qmetric.qmg-utilities.utilities.version>1.37</qmetric.qmg-utilities.utilities.version>
         <springframework.version>3.0.3.RELEASE</springframework.version>
