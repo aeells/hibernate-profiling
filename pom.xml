@@ -4,7 +4,7 @@
 
     <groupId>com.qmetric.hibernate</groupId>
     <artifactId>qmg-hibernate</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0</version>
     <packaging>jar</packaging>
 
     <name>qmg-hibernate</name>
@@ -285,9 +285,9 @@
     </distributionManagement>
 
     <scm>
-        <url>git://github.com/aeells/hibernate-persistence-framework.git</url>
-        <connection>scm:git:git://github.com/aeells/hibernate-persistence-framework.git</connection>
-        <developerConnection>scm:git:git@github.com:aeells/hibernate-persistence-framework.git</developerConnection>
+        <url>git://github.com/qmg-git/qmg-hibernate.git</url>
+        <connection>scm:git:git://github.com/qmg-git/qmg-hibernate.git</connection>
+        <developerConnection>scm:git:git@github.com:qmg-git/qmg-hibernate.git</developerConnection>
     </scm>
 
 </project>
