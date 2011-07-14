@@ -13,6 +13,7 @@ import org.joda.time.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 // Log4j configuration (TRACE) triggers whether performance statistics are recorded
 public final class PersistenceProfilingInterceptor
@@ -40,14 +41,29 @@ public final class PersistenceProfilingInterceptor
         }
     }
 
+    public Object profileRead(final ProceedingJoinPoint call) throws Throwable
+    {
+        if (LOGGER.isTraceEnabled())
+        {
+            final DateTime start = dateTimeSource.now();
+            final PersistenceStrategy model = (PersistenceStrategy) call.proceed();
+            logProfileCall(call, model, (new Duration(start, dateTimeSource.now()).getMillis()));
+            return model;
+        }
+        else
+        {
+            return call.proceed();
+        }
+    }
+
     public Object profileReads(final ProceedingJoinPoint call) throws Throwable
     {
         if (LOGGER.isTraceEnabled())
         {
             final DateTime start = dateTimeSource.now();
-            PersistenceStrategy model = (PersistenceStrategy) call.proceed();
-            logProfileCall(call, model, (new Duration(start, dateTimeSource.now()).getMillis()));
-            return model;
+            @SuppressWarnings({"unchecked"}) final List<PersistenceStrategy> models = (List<PersistenceStrategy>) call.proceed();
+            logProfileCall(call, models, (new Duration(start, dateTimeSource.now()).getMillis()));
+            return models;
         }
         else
         {
@@ -65,10 +81,19 @@ public final class PersistenceProfilingInterceptor
                 LOGGER.trace(new StringBuilder(StringUtils.substringBefore(call.getSignature().getDeclaringType().getSimpleName(), "$")).append("|").
                         append(call.getSignature().getName()).append("|").append(getClassNameAndPersistentId(model)).append("|").append(duration));
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 LOGGER.error("unable to profile class: " + model.getClass());
             }
+        }
+    }
+
+    private void logProfileCall(final ProceedingJoinPoint call, final List<PersistenceStrategy> models, final long duration)
+    {
+        if (models != null && !models.isEmpty())
+        {
+            LOGGER.trace(new StringBuilder(StringUtils.substringBefore(call.getSignature().getDeclaringType().getSimpleName(), "$")).
+                    append("|").append(call.getSignature().getName()).append("|").append(getClassNameAndPersistentIds(models)).append(duration));
         }
     }
 
@@ -76,5 +101,31 @@ public final class PersistenceProfilingInterceptor
     {
         final String identifier = model.getClass().getAnnotation(PersistenceProfiled.class).identifier();
         return new StringBuilder(model.getClass().getSimpleName()).append("|").append(BeanUtils.getProperty(model, identifier)).toString();
+    }
+
+    private String getClassNameAndPersistentIds(final List<PersistenceStrategy> models)
+    {
+        final StringBuilder sb = new StringBuilder();
+        for (final PersistenceStrategy model : models)
+        {
+            if (model.getClass().isAnnotationPresent(PersistenceProfiled.class))
+            {
+                if (sb.length() == 0)
+                {
+                    sb.append(model.getClass().getSimpleName()).append("|");
+                }
+
+                try
+                {
+                    sb.append(BeanUtils.getProperty(model, model.getClass().getAnnotation(PersistenceProfiled.class).identifier())).append("|");
+                }
+                catch (final Exception e)
+                {
+                    LOGGER.error("unable to profile class: " + model.getClass());
+                }
+            }
+        }
+
+        return sb.toString();
     }
 }

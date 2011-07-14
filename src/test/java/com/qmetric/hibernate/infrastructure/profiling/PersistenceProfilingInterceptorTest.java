@@ -19,9 +19,13 @@ import org.powermock.core.classloader.annotations.SuppressStaticInitializationFo
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,9 +71,10 @@ public final class PersistenceProfilingInterceptorTest
     {
         when(mockLogger.isTraceEnabled()).thenReturn(false);
 
+        profiler.profileRead(mockCall);
         profiler.profileReads(mockCall);
 
-        verify(mockCall).proceed();
+        verify(mockCall, times(2)).proceed();
         verify(mockLogger, never()).trace(anyString());
     }
 
@@ -101,6 +106,25 @@ public final class PersistenceProfilingInterceptorTest
         when(mockLogger.isTraceEnabled()).thenReturn(true);
         when(mockCall.proceed()).thenReturn(new ProfiledDomainObject());
 
+        profiler.profileRead(mockCall);
+
+        verify(mockCall).proceed();
+        verify(mockLogger).trace(anyString());
+    }
+
+    @Test
+    public void profileReadsProfilingDomainObjectList() throws Throwable
+    {
+        when(mockLogger.isTraceEnabled()).thenReturn(true);
+        final List<PersistenceStrategy> models = new ArrayList<PersistenceStrategy>()
+        {
+            {
+                this.add(new ProfiledDomainObject());
+            }
+        };
+
+        when(mockCall.proceed()).thenReturn(models);
+
         profiler.profileReads(mockCall);
 
         verify(mockCall).proceed();
@@ -117,7 +141,7 @@ public final class PersistenceProfilingInterceptorTest
         //noinspection ThrowableInstanceNeverThrown
         PowerMockito.when(BeanUtils.getProperty(model, "id")).thenThrow(new RuntimeException());
 
-        profiler.profileReads(mockCall);
+        profiler.profileRead(mockCall);
 
         verify(mockLogger, never()).trace(anyString());
         verify(mockLogger).error(anyString());
