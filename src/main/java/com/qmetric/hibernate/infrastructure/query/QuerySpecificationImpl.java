@@ -126,21 +126,49 @@ public class QuerySpecificationImpl implements QuerySpecification
      */
     private QueryKeyInfo spec(final Class<? extends PersistenceStrategy> persistentClass, final QueryClause queryClause)
     {
+        QueryKeyInfo queryKeyInfo = null;
         final List<Field> fields = getAllFields(new ArrayList<Field>(), persistentClass);
+
         for (final Field field : fields)
         {
-            if (field.isAnnotationPresent(Queryable.class))
+            if (field.isAnnotationPresent(Queryable.class) && field.getAnnotation(Queryable.class).value().equals(queryClause.getFieldName()))
             {
                 final QueryableField fieldType = field.getAnnotation(Queryable.class).fieldType();
-                final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
-                if (fieldType.equals(QueryableField.FOREIGN_KEY) || field.getAnnotation(Queryable.class).value().equals(queryClause.getFieldName()))
+                if (fieldType.equals(QueryableField.GENERAL))
                 {
-                    return new QueryKeyInfo(field.getName(), caseSensitive, queryClause.getOperator());
+                    final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
+                    queryKeyInfo = new QueryKeyInfo(field.getName(), caseSensitive, queryClause.getOperator());
+                    break;
+                }
+
+            }
+        }
+
+        // if we still don't have a key, try for FK queries
+        // [need to do this afterwards, otherwise we introduce a bug]
+        if (queryKeyInfo == null)
+        {
+            for (final Field field : fields)
+            {
+                if (field.isAnnotationPresent(Queryable.class))
+                {
+                    final QueryableField fieldType = field.getAnnotation(Queryable.class).fieldType();
+                    if (fieldType.equals(QueryableField.FOREIGN_KEY) || fieldType.equals(QueryableField.PRIMARY_KEY))
+                    {
+                        final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
+                        queryKeyInfo = new QueryKeyInfo(field.getName(), caseSensitive, queryClause.getOperator());
+                        break;
+                    }
                 }
             }
         }
 
-        throw new IllegalStateException("unable to query class " + persistentClass.getName() + " by type " + queryClause.getFieldName());
+        if (queryKeyInfo == null)
+        {
+            throw new IllegalStateException("unable to query class " + persistentClass.getName() + " by type " + queryClause.getFieldName());
+        }
+
+        return queryKeyInfo;
     }
 
     private List<Field> getAllFields(List<Field> fields, final Class<?> type)
