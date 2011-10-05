@@ -4,7 +4,7 @@
 
     <groupId>com.qmetric.hibernate</groupId>
     <artifactId>qmg-hibernate</artifactId>
-    <version>2.4-SNAPSHOT</version>
+    <version>2.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>qmg-hibernate</name>
@@ -18,8 +18,8 @@
         <hibernate-annotations.version>3.4.0.GA</hibernate-annotations.version>
         <hibernate-core.version>3.3.2.GA</hibernate-core.version>
         <log4j.version>1.2.15</log4j.version>
-        <qmg-utilities.testing.version>1.59-SNAPSHOT</qmg-utilities.testing.version>
-        <qmg-utilities.utilities.version>1.59-SNAPSHOT</qmg-utilities.utilities.version>
+        <qmg-utilities.testing.version>1.59</qmg-utilities.testing.version>
+        <qmg-utilities.utilities.version>1.59</qmg-utilities.utilities.version>
         <springframework.version>3.0.3.RELEASE</springframework.version>
         <!-- test dependencies -->
         <junit.version>4.8.1</junit.version>
