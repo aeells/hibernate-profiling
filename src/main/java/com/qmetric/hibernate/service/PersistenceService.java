@@ -4,7 +4,6 @@ package com.qmetric.hibernate.service;
 
 import com.qmetric.hibernate.infrastructure.query.QuerySpecification;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -18,6 +17,8 @@ public interface PersistenceService<PersistenceStrategy>
      * @param object New object.
      */
     void create(final PersistenceStrategy object);
+
+    PersistenceStrategy findById(Class<? extends PersistenceStrategy> persistentClass, String id);
 
     /**
      * Read unique result object.
@@ -50,6 +51,4 @@ public interface PersistenceService<PersistenceStrategy>
     void delete(final PersistenceStrategy object);
 
     void flush();
-
-    PersistenceStrategy findById(Class<? extends PersistenceStrategy> persistentClass, Serializable id);
 }

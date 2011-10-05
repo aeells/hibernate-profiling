@@ -203,6 +203,14 @@ public final class PersistenceServiceTest
         verify(hibernateTemplate).findByCriteria(criteria);
     }
 
+    @Test
+    public void shouldFlushHibernateSession()
+    {
+        persistenceService.flush();
+
+        verify(hibernateTemplate).flush();
+    }
+
     private class PersistentObjectStub extends AbstractPersistentObject
     {
         public boolean create;

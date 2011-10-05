@@ -34,6 +34,13 @@ public class QuerySpecificationImpl implements QuerySpecification
 
     private Class<? extends PersistenceStrategy> persistentClass;
 
+    public QuerySpecificationImpl(final Class<? extends PersistenceStrategy> persistentClass, String primaryKeyId)
+    {
+        this.persistentClass = persistentClass;
+        this.queryOperator = QuerySpecificationOperator.NONE;
+        this.queryParams.put(new QueryKeyInfo("id", false, QueryClauseOperator.EQ), primaryKeyId);
+    }
+
     /**
      * Constructor.
      * <p/>
@@ -144,16 +151,15 @@ public class QuerySpecificationImpl implements QuerySpecification
             }
         }
 
-        // if we still don't have a key, try for FK queries
+        // if we still don't have a key, try for FK/PK queries
         // [need to do this afterwards, otherwise we introduce a bug]
         if (queryKeyInfo == null)
         {
             for (final Field field : fields)
             {
-                if (field.isAnnotationPresent(Queryable.class))
+                if (field.isAnnotationPresent(Queryable.class) && field.getAnnotation(Queryable.class).value().equals(queryClause.getFieldName()))
                 {
-                    final QueryableField fieldType = field.getAnnotation(Queryable.class).fieldType();
-                    if (fieldType.equals(QueryableField.FOREIGN_KEY) || fieldType.equals(QueryableField.PRIMARY_KEY))
+                    if (field.getAnnotation(Queryable.class).fieldType().equals(QueryableField.FOREIGN_KEY))
                     {
                         final boolean caseSensitive = field.getAnnotation(Queryable.class).isCaseSensitive();
                         queryKeyInfo = new QueryKeyInfo(field.getName(), caseSensitive, queryClause.getOperator());
