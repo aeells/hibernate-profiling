@@ -64,6 +64,8 @@ public class PersistenceServiceITest
         fullyAssertObjectGraph(parent, loadedParent);
     }
 
+    // todo aeells - requires full database integration tests...
+
     private void fullyAssertObjectGraph(final Parent parent, final Parent loadedParent)
     {
         assertThat(parent.getId(), notNullValue());

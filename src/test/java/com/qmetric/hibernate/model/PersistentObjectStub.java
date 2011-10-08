@@ -1,8 +1,9 @@
 package com.qmetric.hibernate.model;
 
 import com.qmetric.hibernate.PersistenceStrategy;
+import com.qmetric.hibernate.profiling.PersistenceProfiled;
 
-public class PersistentObjectStub extends AbstractPersistentObject
+@PersistenceProfiled public class PersistentObjectStub extends AbstractPersistentObject
 {
     public boolean create;
 

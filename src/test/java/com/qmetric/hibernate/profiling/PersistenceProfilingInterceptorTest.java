@@ -4,6 +4,7 @@ package com.qmetric.hibernate.profiling;
 
 import com.qmetric.hibernate.PersistenceStrategy;
 import com.qmetric.hibernate.model.AbstractPersistentObject;
+import com.qmetric.hibernate.model.PersistentObjectStub;
 import com.qmetric.utilities.time.DateTimeSource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Appender;
@@ -94,7 +95,7 @@ public final class PersistenceProfilingInterceptorTest
     {
         when(mockLogger.isTraceEnabled()).thenReturn(true);
 
-        profiler.profileWrites(mockCall, new ProfiledDomainObject());
+        profiler.profileWrites(mockCall, new PersistentObjectStub());
 
         verify(mockCall).proceed();
         verify(mockLogger).trace(anyString());
@@ -104,7 +105,7 @@ public final class PersistenceProfilingInterceptorTest
     public void profileReadProfilingDomainObject() throws Throwable
     {
         when(mockLogger.isTraceEnabled()).thenReturn(true);
-        when(mockCall.proceed()).thenReturn(new ProfiledDomainObject());
+        when(mockCall.proceed()).thenReturn(new PersistentObjectStub());
 
         profiler.profileRead(mockCall);
 
@@ -119,7 +120,7 @@ public final class PersistenceProfilingInterceptorTest
         final List<PersistenceStrategy> models = new ArrayList<PersistenceStrategy>()
         {
             {
-                this.add(new ProfiledDomainObject());
+                this.add(new PersistentObjectStub());
             }
         };
 
@@ -135,7 +136,7 @@ public final class PersistenceProfilingInterceptorTest
     public void logReflectionErrors() throws Throwable
     {
         when(mockLogger.isTraceEnabled()).thenReturn(true);
-        final PersistenceStrategy model = new ProfiledDomainObject();
+        final PersistenceStrategy model = new PersistentObjectStub();
         when(mockCall.proceed()).thenReturn(model);
         PowerMockito.mockStatic(BeanUtils.class);
         //noinspection ThrowableInstanceNeverThrown
@@ -145,13 +146,5 @@ public final class PersistenceProfilingInterceptorTest
 
         verify(mockLogger, never()).trace(anyString());
         verify(mockLogger).error(anyString());
-    }
-
-    @PersistenceProfiled class ProfiledDomainObject extends AbstractPersistentObject
-    {
-        ProfiledDomainObject()
-        {
-
-        }
     }
 }
