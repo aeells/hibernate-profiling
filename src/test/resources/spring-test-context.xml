@@ -21,7 +21,7 @@ http://www.springframework.org/schema/aop http://www.springframework.org/schema/
                 <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
             </props>
         </property>
-        <property name="packagesToScan" value="com.qmetric.hibernate.infrastructure.model"/>
+        <property name="packagesToScan" value="com.qmetric.hibernate.model"/>
     </bean>
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
@@ -35,9 +35,7 @@ http://www.springframework.org/schema/aop http://www.springframework.org/schema/
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <bean class="org.springframework.orm.hibernate3.HibernateTemplate" autowire="constructor"/>
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate" autowire="constructor"/>
 
-    <bean class="com.qmetric.hibernate.service.QuerySpecificationTranslator"/>
-
-    <bean id="service" class="com.qmetric.hibernate.service.PersistenceServiceImpl" autowire="constructor"/>
+    <bean id="persistenceService" class="com.qmetric.hibernate.service.PersistenceServiceImpl" autowire="constructor"/>
 </beans>

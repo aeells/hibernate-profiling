@@ -1,6 +1,6 @@
 // Copyright (c) 2011, QMetric Group Limited. All rights reserved.
 
-package com.qmetric.hibernate.infrastructure.query;
+package com.qmetric.hibernate.profiling;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -9,16 +9,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates an object field that is queryable.
+ * Indicates this class will be intercepted and profiled when passed to the Persistence framework.
  */
 @Documented
-@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Queryable
+public @interface PersistenceProfiled
 {
-    String value();
-
-    QueryableField fieldType() default QueryableField.GENERAL;
-
-    boolean isCaseSensitive() default true;
+    String identifier() default "id";
 }

@@ -1,7 +1,6 @@
-package com.qmetric.hibernate.infrastructure.model;
+package com.qmetric.hibernate.model;
 
 import com.qmetric.hibernate.PersistenceStrategy;
-import com.qmetric.hibernate.infrastructure.query.Queryable;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -20,43 +19,16 @@ import javax.persistence.Version;
 @MappedSuperclass
 public abstract class AbstractPersistentObject implements PersistenceStrategy
 {
-    @Id @GeneratedValue(generator = "system-uuid") @GenericGenerator(name = "system-uuid", strategy = "uuid") @Queryable("id")
+    @Id @GeneratedValue(generator = "system-uuid") @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
 
     @Version @Column(nullable = false) @SuppressWarnings({"UnusedDeclaration"})
     private int version;
-    //
-    //    @Column(nullable = false) @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
-    //    private DateTime created = new DateTime();
-    //
-    //    @Column(nullable = false, name = "LAST_MODIFIED") @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
-    //    private DateTime lastModified = new DateTime();
-    //
-        public String getId()
-        {
-            return id;
-        }
-    //
-    //    public void setId(final String id)
-    //    {
-    //        this.id = id;
-    //    }
-    //
-    //    public DateTime getCreated()
-    //    {
-    //        return created;
-    //    }
-    //
-    //    public void setCreated(final DateTime created)
-    //    {
-    //        this.created = created;
-    //    }
-    //
-    //    public DateTime getLastModified()
-    //    {
-    //        return lastModified;
-    //    }
-    //
+
+    public String getId()
+    {
+        return id;
+    }
 
     @Override public boolean isCreatable()
     {
@@ -72,12 +44,6 @@ public abstract class AbstractPersistentObject implements PersistenceStrategy
     {
         return true;
     }
-    //
-    //    public void setLastModified(final DateTime lastModified)
-    //    {
-    //        this.lastModified = lastModified;
-    //    }
-    //
 
     public void setVersion(final int version)
     {

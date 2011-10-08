@@ -1,4 +1,4 @@
-package com.qmetric.hibernate.infrastructure.model;
+package com.qmetric.hibernate.model;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;

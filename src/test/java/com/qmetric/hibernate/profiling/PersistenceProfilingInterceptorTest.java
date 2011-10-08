@@ -1,9 +1,9 @@
 // Copyright (c) 2011, QMetric Group Limited. All rights reserved.
 
-package com.qmetric.hibernate.infrastructure.profiling;
+package com.qmetric.hibernate.profiling;
 
 import com.qmetric.hibernate.PersistenceStrategy;
-import com.qmetric.hibernate.infrastructure.model.AbstractPersistentObject;
+import com.qmetric.hibernate.model.AbstractPersistentObject;
 import com.qmetric.utilities.time.DateTimeSource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Appender;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class) @PrepareForTest({Appender.class, BeanUtils.class})
-@SuppressStaticInitializationFor("com.qmetric.hibernate.infrastructure.profiling.PersistenceProfilingInterceptor")
+@SuppressStaticInitializationFor("com.qmetric.hibernate.profiling.PersistenceProfilingInterceptor")
 public final class PersistenceProfilingInterceptorTest
 {
     private final ProceedingJoinPoint mockCall = mock(ProceedingJoinPoint.class);

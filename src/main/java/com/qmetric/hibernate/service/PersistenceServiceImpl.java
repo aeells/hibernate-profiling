@@ -3,13 +3,16 @@
 package com.qmetric.hibernate.service;
 
 import com.qmetric.hibernate.PersistenceStrategy;
-import com.qmetric.hibernate.infrastructure.query.QuerySpecification;
-import com.qmetric.hibernate.infrastructure.query.QuerySpecificationImpl;
-import com.qmetric.hibernate.infrastructure.query.QueryType;
 import org.apache.commons.lang.Validate;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,12 +22,9 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
 {
     private final HibernateTemplate hibernateTemplate;
 
-    private final QuerySpecificationTranslator translator;
-
-    public PersistenceServiceImpl(final HibernateTemplate hibernateTemplate, final QuerySpecificationTranslator translator)
+    public PersistenceServiceImpl(final HibernateTemplate hibernateTemplate)
     {
         this.hibernateTemplate = hibernateTemplate;
-        this.translator = translator;
     }
 
     @Override public final void create(final PersistenceStrategy model)
@@ -56,24 +56,87 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         hibernateTemplate.flush();
     }
 
-    @Override public PersistenceStrategy findById(final Class<? extends PersistenceStrategy> persistentClass, final String id)
+    public PersistenceStrategy findByPrimaryKey(final Class<? extends PersistenceStrategy> daoClass, final String pkFieldName, final String pk)
     {
-        return readUnique(new QuerySpecificationImpl(persistentClass, id));
+        validateDaoFieldAccess(daoClass, pkFieldName);
+
+        final DetachedCriteria criteria = DetachedCriteria.forClass(daoClass).add(Restrictions.eq(pkFieldName, pk));
+        //noinspection unchecked
+        return DataAccessUtils.uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria));
     }
 
-    @Override public final PersistenceStrategy readUnique(final QuerySpecification querySpecification)
+    public List<PersistenceStrategy> findByForeignKey(final Class<? extends PersistenceStrategy> daoClass, final String fkFieldName, final PersistenceStrategy fk)
     {
-        Validate.notNull(querySpecification, "query specification should be non-null!");
+        validateDaoFieldAccess(daoClass, fkFieldName);
 
-        return DataAccessUtils.uniqueResult(readList(querySpecification));
+        final DetachedCriteria criteria = DetachedCriteria.forClass(daoClass).add(Restrictions.eq(fkFieldName, fk));
+        //noinspection unchecked
+        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria);
     }
 
-    @Override public final List<PersistenceStrategy> readList(final QuerySpecification querySpecification)
+    public final PersistenceStrategy findUnique(final Class<? extends PersistenceStrategy> daoClass, final Criterion... criterion)
     {
-        Validate.notNull(querySpecification, "query specification should be non-null!");
+        validateDaoClassAccess(daoClass);
 
         //noinspection unchecked
-        return hibernateTemplate.findByCriteria(translator.translate(querySpecification));
+        return DataAccessUtils.uniqueResult(findCollection(daoClass, criterion));
+    }
+
+    public final List<PersistenceStrategy> findCollection(final Class<? extends PersistenceStrategy> daoClass, final Criterion... criterion)
+    {
+        validateDaoClassAccess(daoClass);
+
+        final DetachedCriteria dc = addCriteria(daoClass, criterion);
+
+        //noinspection unchecked
+        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(dc);
+    }
+
+    private DetachedCriteria addCriteria(final Class<? extends PersistenceStrategy> daoClass, final Criterion... criterion)
+    {
+        DetachedCriteria dc = DetachedCriteria.forClass(daoClass);
+
+        for (final Criterion c : criterion)
+        {
+            dc = dc.add(c);
+        }
+
+        return dc;
+    }
+
+    private void validateDaoFieldAccess(final Class clazz, final String... fieldName)
+    {
+        validateDaoClassAccess(clazz);
+
+        Validate.isTrue(getAllFields(new ArrayList<String>(), clazz).containsAll(Arrays.asList(fieldName)));
+    }
+
+    private void validateDaoClassAccess(final Class clazz)
+    {
+        Validate.notNull(clazz);
+    }
+
+    private List<String> getAllFields(List<String> fields, final Class clazz)
+    {
+        fields.addAll(getFieldNamesFrom(Arrays.asList(clazz.getDeclaredFields())));
+
+        if (clazz.getSuperclass() != null)
+        {
+            fields = getAllFields(fields, clazz.getSuperclass());
+        }
+
+        return fields;
+    }
+
+    private List<String> getFieldNamesFrom(final List<Field> fields)
+    {
+        final List<String> fieldNames = new ArrayList<String>();
+        for (final Field field : fields)
+        {
+            fieldNames.add(field.getName());
+        }
+
+        return fieldNames;
     }
 
     private void saveOrUpdate(final PersistenceStrategy model)
@@ -85,14 +148,6 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         else
         {
             hibernateTemplate.saveOrUpdate(model);
-        }
-    }
-
-    private class PrimaryId implements QueryType
-    {
-        @Override public String getFieldName()
-        {
-            return "id";
         }
     }
 }

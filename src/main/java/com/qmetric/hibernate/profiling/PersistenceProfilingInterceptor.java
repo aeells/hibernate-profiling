@@ -1,6 +1,6 @@
 // Copyright (c) 2011, QMetric Group Limited. All rights reserved.
 
-package com.qmetric.hibernate.infrastructure.profiling;
+package com.qmetric.hibernate.profiling;
 
 import com.qmetric.hibernate.PersistenceStrategy;
 import com.qmetric.utilities.time.DateTimeSource;
