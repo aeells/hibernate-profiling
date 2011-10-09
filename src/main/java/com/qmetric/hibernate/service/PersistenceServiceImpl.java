@@ -16,7 +16,14 @@ import static org.springframework.dao.support.DataAccessUtils.uniqueResult;
  */
 public class PersistenceServiceImpl implements PersistenceService<PersistenceStrategy>
 {
-    public static final PersistenceStrategy NO_OP_PERSISTENCE_STRATEGY = new NoOpPersistenceStrategy();
+    public static final PersistenceStrategy NO_OP_STRATEGY = new NoOpPersistenceStrategy();
+
+    public static final List<PersistenceStrategy> NO_OP_COLLECTION = new ArrayList<PersistenceStrategy>()
+    {
+        {
+            this.add(NO_OP_STRATEGY);
+        }
+    };
 
     private final HibernateTemplate hibernateTemplate;
 
@@ -57,23 +64,13 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
     public PersistenceStrategy findUnique(final PersistenceQuery query)
     {
         //noinspection unchecked
-        return query == null ? NO_OP_PERSISTENCE_STRATEGY : uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria()));
+        return query == null ? NO_OP_STRATEGY : uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria()));
     }
 
     public final List<PersistenceStrategy> find(final PersistenceQuery query)
     {
         //noinspection unchecked
-        return query == null ? noOpCollection() : (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria());
-    }
-
-    private ArrayList<PersistenceStrategy> noOpCollection()
-    {
-        return new ArrayList<PersistenceStrategy>()
-        {
-            {
-                this.add(NO_OP_PERSISTENCE_STRATEGY);
-            }
-        };
+        return query == null ? NO_OP_COLLECTION : (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria());
     }
 
     // todo aeells - why are we doing merge and saveOrUpdate as opposed to save and update separately ?
