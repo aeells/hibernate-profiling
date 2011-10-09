@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static com.qmetric.hibernate.service.HibernateQueryWrapper.Builder.queryFor;
+import static com.qmetric.hibernate.HibernateQueryWrapper.Builder.queryFor;
 import static com.qmetric.hibernate.service.PersistenceServiceImpl.NO_OP_STRATEGY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

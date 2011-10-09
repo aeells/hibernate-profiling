@@ -2,6 +2,8 @@
 
 package com.qmetric.hibernate.service;
 
+import com.qmetric.hibernate.HibernateQueryWrapper;
+
 import java.util.List;
 
 /**

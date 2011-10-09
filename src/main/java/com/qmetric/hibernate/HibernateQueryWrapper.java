@@ -1,8 +1,7 @@
 // Copyright (c) 2011, QMetric Group Limited. All rights reserved.
 
-package com.qmetric.hibernate.service;
+package com.qmetric.hibernate;
 
-import com.qmetric.hibernate.PersistenceStrategy;
 import org.apache.commons.lang.Validate;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;

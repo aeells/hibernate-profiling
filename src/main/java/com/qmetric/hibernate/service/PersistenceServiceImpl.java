@@ -2,6 +2,7 @@
 
 package com.qmetric.hibernate.service;
 
+import com.qmetric.hibernate.HibernateQueryWrapper;
 import com.qmetric.hibernate.NoOpPersistenceStrategy;
 import com.qmetric.hibernate.PersistenceStrategy;
 import org.springframework.orm.hibernate3.HibernateTemplate;

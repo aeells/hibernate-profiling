@@ -1,11 +1,12 @@
-package com.qmetric.hibernate.service;
+package com.qmetric.hibernate;
 
+import com.qmetric.hibernate.HibernateQueryWrapper;
 import com.qmetric.hibernate.PersistenceStrategy;
 import com.qmetric.hibernate.model.PersistentObjectStub;
 import org.hibernate.criterion.DetachedCriteria;
 import org.junit.Test;
 
-import static com.qmetric.hibernate.service.HibernateQueryWrapper.Builder.queryFor;
+import static com.qmetric.hibernate.HibernateQueryWrapper.Builder.queryFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
