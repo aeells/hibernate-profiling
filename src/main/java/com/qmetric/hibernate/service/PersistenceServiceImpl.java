@@ -2,24 +2,22 @@
 
 package com.qmetric.hibernate.service;
 
+import com.qmetric.hibernate.NoOpPersistenceStrategy;
 import com.qmetric.hibernate.PersistenceStrategy;
-import org.apache.commons.lang.Validate;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import static org.springframework.dao.support.DataAccessUtils.uniqueResult;
 
 /**
  * Standardised database repository access implementation.
  */
 public class PersistenceServiceImpl implements PersistenceService<PersistenceStrategy>
 {
+    public static final PersistenceStrategy NO_OP_PERSISTENCE_STRATEGY = new NoOpPersistenceStrategy();
+
     private final HibernateTemplate hibernateTemplate;
 
     public PersistenceServiceImpl(final HibernateTemplate hibernateTemplate)
@@ -56,89 +54,29 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         hibernateTemplate.flush();
     }
 
-    public PersistenceStrategy findByPrimaryKey(final Class<? extends PersistenceStrategy> daoClass, final String pkFieldName, final String pk)
+    public PersistenceStrategy findUnique(final PersistenceQuery query)
     {
-        validateDaoFieldAccess(daoClass, pkFieldName);
-
-        final DetachedCriteria criteria = DetachedCriteria.forClass(daoClass).add(Restrictions.eq(pkFieldName, pk));
         //noinspection unchecked
-        return DataAccessUtils.uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria));
+        return query == null ? NO_OP_PERSISTENCE_STRATEGY : uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria()));
     }
 
-    public List<PersistenceStrategy> findByForeignKey(final Class<? extends PersistenceStrategy> daoClass, final String fkFieldName, final PersistenceStrategy fk)
+    public final List<PersistenceStrategy> find(final PersistenceQuery query)
     {
-        validateDaoFieldAccess(daoClass, fkFieldName);
-
-        final DetachedCriteria criteria = DetachedCriteria.forClass(daoClass).add(Restrictions.eq(fkFieldName, fk));
         //noinspection unchecked
-        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria);
+        return query == null ? noOpCollection() : (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria());
     }
 
-    public final PersistenceStrategy findUnique(final Class<? extends PersistenceStrategy> daoClass, final Criterion... criterion)
+    private ArrayList<PersistenceStrategy> noOpCollection()
     {
-        validateDaoClassAccess(daoClass);
-
-        //noinspection unchecked
-        return DataAccessUtils.uniqueResult(findCollection(daoClass, criterion));
-    }
-
-    public final List<PersistenceStrategy> findCollection(final Class<? extends PersistenceStrategy> daoClass, final Criterion... criterion)
-    {
-        validateDaoClassAccess(daoClass);
-
-        final DetachedCriteria dc = addCriteria(daoClass, criterion);
-
-        //noinspection unchecked
-        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(dc);
-    }
-
-    private DetachedCriteria addCriteria(final Class<? extends PersistenceStrategy> daoClass, final Criterion... criterion)
-    {
-        DetachedCriteria dc = DetachedCriteria.forClass(daoClass);
-
-        for (final Criterion c : criterion)
+        return new ArrayList<PersistenceStrategy>()
         {
-            dc = dc.add(c);
-        }
-
-        return dc;
+            {
+                this.add(NO_OP_PERSISTENCE_STRATEGY);
+            }
+        };
     }
 
-    private void validateDaoFieldAccess(final Class clazz, final String... fieldName)
-    {
-        validateDaoClassAccess(clazz);
-
-        Validate.isTrue(getAllFields(new ArrayList<String>(), clazz).containsAll(Arrays.asList(fieldName)));
-    }
-
-    private void validateDaoClassAccess(final Class clazz)
-    {
-        Validate.notNull(clazz);
-    }
-
-    private List<String> getAllFields(List<String> fields, final Class clazz)
-    {
-        fields.addAll(getFieldNamesFrom(Arrays.asList(clazz.getDeclaredFields())));
-
-        if (clazz.getSuperclass() != null)
-        {
-            fields = getAllFields(fields, clazz.getSuperclass());
-        }
-
-        return fields;
-    }
-
-    private List<String> getFieldNamesFrom(final List<Field> fields)
-    {
-        final List<String> fieldNames = new ArrayList<String>();
-        for (final Field field : fields)
-        {
-            fieldNames.add(field.getName());
-        }
-
-        return fieldNames;
-    }
-
+    // todo aeells - why are we doing merge and saveOrUpdate as opposed to save and update separately ?
     private void saveOrUpdate(final PersistenceStrategy model)
     {
         if (hibernateTemplate.contains(model))

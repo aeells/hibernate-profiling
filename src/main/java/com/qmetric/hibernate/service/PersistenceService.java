@@ -2,8 +2,6 @@
 
 package com.qmetric.hibernate.service;
 
-import org.hibernate.criterion.Criterion;
-
 import java.util.List;
 
 /**
@@ -19,11 +17,7 @@ public interface PersistenceService<PersistenceStrategy>
 
     void flush();
 
-    PersistenceStrategy findByPrimaryKey(final Class<? extends PersistenceStrategy> daoClass, final String pkFieldName, final String pk);
+    PersistenceStrategy findUnique(final PersistenceQuery query);
 
-    List<PersistenceStrategy> findByForeignKey(final Class<? extends PersistenceStrategy> daoClass, final String fkFieldName, final com.qmetric.hibernate.PersistenceStrategy fk);
-
-    PersistenceStrategy findUnique(final Class<? extends PersistenceStrategy> daoClass, final Criterion... criterion);
-
-    List<PersistenceStrategy> findCollection(final Class<? extends PersistenceStrategy> daoClass, final Criterion... criterion);
+    List<PersistenceStrategy> find(final PersistenceQuery query);
 }
