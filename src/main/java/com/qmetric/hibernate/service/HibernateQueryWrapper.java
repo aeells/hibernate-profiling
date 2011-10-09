@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class PersistenceQuery
+public final class HibernateQueryWrapper
 {
     private final Class<? extends PersistenceStrategy> daoClass;
 
     private DetachedCriteria criteria;
 
-    private PersistenceQuery(final Class<? extends PersistenceStrategy> daoClass)
+    private HibernateQueryWrapper(final Class<? extends PersistenceStrategy> daoClass)
     {
         this.daoClass = daoClass;
         this.criteria = DetachedCriteria.forClass(daoClass);
@@ -48,7 +48,7 @@ public final class PersistenceQuery
 
     public static final class Builder
     {
-        private final PersistenceQuery query;
+        private final HibernateQueryWrapper query;
 
         private final Class daoClass;
 
@@ -58,7 +58,7 @@ public final class PersistenceQuery
         public Builder(final Class<? extends PersistenceStrategy> daoClass)
         {
             this.daoClass = daoClass;
-            this.query = new PersistenceQuery(daoClass);
+            this.query = new HibernateQueryWrapper(daoClass);
         }
 
         public static Builder queryFor(final Class<? extends PersistenceStrategy> daoClass)
@@ -96,7 +96,7 @@ public final class PersistenceQuery
             return this;
         }
 
-        public PersistenceQuery build()
+        public HibernateQueryWrapper build()
         {
             this.validateCriteriaFields();
             return query;

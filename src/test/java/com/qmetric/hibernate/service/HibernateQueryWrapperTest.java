@@ -5,18 +5,18 @@ import com.qmetric.hibernate.model.PersistentObjectStub;
 import org.hibernate.criterion.DetachedCriteria;
 import org.junit.Test;
 
-import static com.qmetric.hibernate.service.PersistenceQuery.Builder.queryFor;
+import static com.qmetric.hibernate.service.HibernateQueryWrapper.Builder.queryFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertNotNull;
 
-public final class PersistenceQueryTest
+public final class HibernateQueryWrapperTest
 {
     @Test
     public void basicBuild()
     {
-        final PersistenceQuery query = queryFor(PersistentObjectStub.class).build();
+        final HibernateQueryWrapper query = queryFor(PersistentObjectStub.class).build();
 
         //noinspection unchecked
         assertThat((Class<PersistentObjectStub>) query.getDaoClass(), equalTo(PersistentObjectStub.class));
@@ -26,7 +26,7 @@ public final class PersistenceQueryTest
     @Test
     public void primaryKeyBuild()
     {
-        final PersistenceQuery query = queryFor(PersistentObjectStub.class).withPrimaryKey("id", "a").build();
+        final HibernateQueryWrapper query = queryFor(PersistentObjectStub.class).withPrimaryKey("id", "a").build();
         final DetachedCriteria criteria = query.getCriteria();
 
         //noinspection unchecked
@@ -39,7 +39,7 @@ public final class PersistenceQueryTest
     {
         final PersistenceStrategy foreignKeyRef = new PersistentObjectStub();
         final PersistenceStrategy primaryObject = new PersistentObjectStub(foreignKeyRef);
-        final PersistenceQuery query = queryFor(PersistentObjectStub.class).withForeignKey("reference", foreignKeyRef).build();
+        final HibernateQueryWrapper query = queryFor(PersistentObjectStub.class).withForeignKey("reference", foreignKeyRef).build();
         final DetachedCriteria criteria = query.getCriteria();
 
         //noinspection unchecked

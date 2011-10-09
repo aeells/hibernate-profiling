@@ -61,13 +61,13 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         hibernateTemplate.flush();
     }
 
-    public PersistenceStrategy findUnique(final PersistenceQuery query)
+    public PersistenceStrategy findUnique(final HibernateQueryWrapper query)
     {
         //noinspection unchecked
         return query == null ? NO_OP_STRATEGY : uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria()));
     }
 
-    public final List<PersistenceStrategy> find(final PersistenceQuery query)
+    public final List<PersistenceStrategy> find(final HibernateQueryWrapper query)
     {
         //noinspection unchecked
         return query == null ? NO_OP_COLLECTION : (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria());

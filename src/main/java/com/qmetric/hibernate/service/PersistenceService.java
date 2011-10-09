@@ -17,7 +17,7 @@ public interface PersistenceService<PersistenceStrategy>
 
     void flush();
 
-    PersistenceStrategy findUnique(final PersistenceQuery query);
+    PersistenceStrategy findUnique(final HibernateQueryWrapper query);
 
-    List<PersistenceStrategy> find(final PersistenceQuery query);
+    List<PersistenceStrategy> find(final HibernateQueryWrapper query);
 }
