@@ -3,10 +3,10 @@
 package com.qmetric.hibernate.service;
 
 import com.qmetric.hibernate.HibernateQueryWrapper;
-import com.qmetric.hibernate.NoOpPersistenceStrategy;
 import com.qmetric.hibernate.PersistenceStrategy;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.dao.support.DataAccessUtils.uniqueResult;
@@ -55,16 +55,16 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
     public PersistenceStrategy findUnique(final HibernateQueryWrapper query)
     {
         //noinspection unchecked
-        return query == null ? NoOpPersistenceStrategy.NO_OP_INSTANCE : uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria()));
+        return query == null ? null : uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria()));
     }
 
     public final List<PersistenceStrategy> find(final HibernateQueryWrapper query)
     {
         //noinspection unchecked
-        return query == null ? NoOpPersistenceStrategy.NO_OP_COLLECTION : (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria());
+        return query == null ? Collections.<PersistenceStrategy>emptyList() : (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria());
     }
 
-    // todo aeells - why are we doing merge and saveOrUpdate as opposed to save and update separately ?
+    // safeguard against detached objects
     private void saveOrUpdate(final PersistenceStrategy model)
     {
         if (hibernateTemplate.contains(model))
