@@ -77,7 +77,7 @@ public final class HibernateQueryWrapper
             return with(fieldName, fieldValue);
         }
 
-        public Builder withReference(final String fieldName, final Object fieldValue)
+        public Builder withField(final String fieldName, final Object fieldValue)
         {
             return with(fieldName, fieldValue);
         }
