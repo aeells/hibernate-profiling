@@ -7,7 +7,6 @@ import com.qmetric.hibernate.NoOpPersistenceStrategy;
 import com.qmetric.hibernate.PersistenceStrategy;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.dao.support.DataAccessUtils.uniqueResult;
@@ -17,15 +16,6 @@ import static org.springframework.dao.support.DataAccessUtils.uniqueResult;
  */
 public class PersistenceServiceImpl implements PersistenceService<PersistenceStrategy>
 {
-    public static final PersistenceStrategy NO_OP_STRATEGY = new NoOpPersistenceStrategy();
-
-    public static final List<PersistenceStrategy> NO_OP_COLLECTION = new ArrayList<PersistenceStrategy>()
-    {
-        {
-            this.add(NO_OP_STRATEGY);
-        }
-    };
-
     private final HibernateTemplate hibernateTemplate;
 
     public PersistenceServiceImpl(final HibernateTemplate hibernateTemplate)
@@ -65,13 +55,13 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
     public PersistenceStrategy findUnique(final HibernateQueryWrapper query)
     {
         //noinspection unchecked
-        return query == null ? NO_OP_STRATEGY : uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria()));
+        return query == null ? NoOpPersistenceStrategy.NO_OP_INSTANCE : uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria()));
     }
 
     public final List<PersistenceStrategy> find(final HibernateQueryWrapper query)
     {
         //noinspection unchecked
-        return query == null ? NO_OP_COLLECTION : (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria());
+        return query == null ? NoOpPersistenceStrategy.NO_OP_COLLECTION : (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria());
     }
 
     // todo aeells - why are we doing merge and saveOrUpdate as opposed to save and update separately ?

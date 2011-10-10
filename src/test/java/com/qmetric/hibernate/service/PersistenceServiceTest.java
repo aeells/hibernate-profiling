@@ -2,6 +2,7 @@
 
 package com.qmetric.hibernate.service;
 
+import com.qmetric.hibernate.NoOpPersistenceStrategy;
 import com.qmetric.hibernate.PersistenceStrategy;
 import com.qmetric.hibernate.model.PersistentObjectStub;
 import org.hibernate.criterion.DetachedCriteria;
@@ -18,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.qmetric.hibernate.HibernateQueryWrapper.Builder.queryFor;
-import static com.qmetric.hibernate.service.PersistenceServiceImpl.NO_OP_STRATEGY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNull;
@@ -157,14 +157,14 @@ public final class PersistenceServiceTest
     public void findUniqueReturnsNoOpPersistenceStrategyWithNullDaoClass()
     {
         final PersistenceStrategy noop = persistenceService.findUnique(null);
-        assertThat(noop, equalTo(NO_OP_STRATEGY));
+        assertThat(noop, equalTo(NoOpPersistenceStrategy.NO_OP_INSTANCE));
     }
 
     @Test
     public void findReturnsNoOpPersistenceStrategyWithNullDaoClass()
     {
         final List<PersistenceStrategy> daos = persistenceService.find(null);
-        assertThat(daos.containsAll(Arrays.asList(NO_OP_STRATEGY)), equalTo(true));
+        assertThat(daos.containsAll(Arrays.asList(NoOpPersistenceStrategy.NO_OP_INSTANCE)), equalTo(true));
     }
 
     @Test
