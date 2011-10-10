@@ -13,7 +13,7 @@ import com.qmetric.hibernate.profiling.PersistenceProfiled;
 
     private PersistenceStrategy foreignKeyRef;
 
-    private String reference;
+    private String fieldName;
 
     public PersistentObjectStub()
     {
@@ -24,9 +24,9 @@ import com.qmetric.hibernate.profiling.PersistenceProfiled;
         this.foreignKeyRef = foreignKeyRef;
     }
 
-    public PersistentObjectStub(final String reference)
+    public PersistentObjectStub(final String fieldName)
     {
-        this.reference = reference;
+        this.fieldName = fieldName;
     }
 
     @Override
@@ -52,8 +52,8 @@ import com.qmetric.hibernate.profiling.PersistenceProfiled;
         return foreignKeyRef;
     }
 
-    public String getReference()
+    public String getFieldName()
     {
-        return reference;
+        return fieldName;
     }
 }

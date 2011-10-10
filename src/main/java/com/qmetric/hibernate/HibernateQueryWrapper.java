@@ -19,6 +19,8 @@ public final class HibernateQueryWrapper
 
     private DetachedCriteria criteria;
 
+    private QueryLimit limit = QueryLimit.NULL_IMPL;
+
     private HibernateQueryWrapper(final Class<? extends PersistenceStrategy> daoClass)
     {
         this.daoClass = daoClass;
@@ -35,6 +37,11 @@ public final class HibernateQueryWrapper
         return criteria;
     }
 
+    public QueryLimit getLimit()
+    {
+        return limit;
+    }
+
     void addCriterion(final SimpleExpression expression)
     {
         this.criteria.add(expression);
@@ -43,6 +50,11 @@ public final class HibernateQueryWrapper
     void addOrder(final Order order)
     {
         this.criteria.addOrder(order);
+    }
+
+    void addLimit(final int firstResult, final int maxResults)
+    {
+        this.limit = new QueryLimit(firstResult, maxResults);
     }
 
     public static final class Builder
@@ -89,9 +101,21 @@ public final class HibernateQueryWrapper
             return this;
         }
 
-        public Builder sort()
+        public Builder sortAsc(final String fieldName)
         {
-            query.addOrder(null);
+            query.addOrder(Order.asc(fieldName));
+            return this;
+        }
+
+        public Builder sortDesc(final String fieldName)
+        {
+            query.addOrder(Order.desc(fieldName));
+            return this;
+        }
+
+        public Builder limit(final int firstResult, final int maxResults)
+        {
+            query.addLimit(firstResult, maxResults);
             return this;
         }
 
@@ -102,7 +126,7 @@ public final class HibernateQueryWrapper
         }
 
         // does not validate isAssignable from PersistenceStrategy as compile-time generics present
-        public void validateCriteriaFields()
+        private void validateCriteriaFields()
         {
             Validate.isTrue(getAllFields(new ArrayList<String>(), daoClass).containsAll(fieldNames));
         }

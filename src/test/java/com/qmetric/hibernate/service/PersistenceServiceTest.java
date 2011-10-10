@@ -20,6 +20,7 @@ import static com.qmetric.hibernate.HibernateQueryWrapper.Builder.queryFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -141,7 +142,7 @@ public final class PersistenceServiceTest
     public void findByForeignKeyThrowsExceptionWithNullDaoClass()
     {
         final PersistenceStrategy foreignKeyObject = new PersistentObjectStub();
-        persistenceService.find(queryFor(null).withForeignKey("reference", foreignKeyObject).build());
+        persistenceService.find(queryFor(null).withForeignKey("fieldName", foreignKeyObject).build());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -151,18 +152,16 @@ public final class PersistenceServiceTest
         persistenceService.find(queryFor(null).withForeignKey("no-field-with-this-name", foreignKeyObject).build());
     }
 
-    @Test
-    public void findUniqueReturnsNullWithNullDaoClass()
+    @Test(expected = Exception.class)
+    public void findUniqueShouldThrowExceptionWithNullDaoClass()
     {
-        final PersistenceStrategy noop = persistenceService.findUnique(null);
-        assertThat(noop, equalTo(null));
+        persistenceService.findUnique(null);
     }
 
-    @Test
-    public void findReturnsEmptyCollectionWithNullDaoClass()
+    @Test(expected = Exception.class)
+    public void findShouldThrowExceptionWithNullDaoClass()
     {
-        final List<PersistenceStrategy> daos = persistenceService.find(null);
-        assertThat(daos.isEmpty(), equalTo(true));
+        persistenceService.find(null);
     }
 
     @Test
@@ -170,29 +169,29 @@ public final class PersistenceServiceTest
     {
         final PersistentObjectStub primaryObject = new PersistentObjectStub();
 
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(primaryObject));
+        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt())).thenReturn(Arrays.asList(primaryObject));
 
         final PersistenceStrategy dao = persistenceService.findUnique(queryFor(PersistentObjectStub.class).withPrimaryKey("id", "1234").build());
 
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
+        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt());
         assertThat(primaryObject, equalTo(dao));
     }
 
     @Test
     public void shouldSuccessfullyHandleNotFindingByPrimaryKey()
     {
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Collections.emptyList());
+        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt())).thenReturn(Collections.emptyList());
 
         final PersistenceStrategy dao = persistenceService.findUnique(queryFor(PersistentObjectStub.class).withPrimaryKey("id", "1234").build());
 
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
+        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt());
         assertNull(dao); // this shows that it can return when list is null
     }
 
     @Test(expected = IncorrectResultSizeDataAccessException.class)
     public void shouldThrowUniqueExceptionWhenFindUniqueReturnsMoreThanOneResult()
     {
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(new PersistentObjectStub(), new PersistentObjectStub()));
+        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt())).thenReturn(Arrays.asList(new PersistentObjectStub(), new PersistentObjectStub()));
 
         persistenceService.findUnique(queryFor(PersistentObjectStub.class).build());
     }
@@ -203,11 +202,11 @@ public final class PersistenceServiceTest
         final PersistenceStrategy foreignKeyRef = new PersistentObjectStub();
         final PersistenceStrategy primaryObject = new PersistentObjectStub(foreignKeyRef);
 
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(primaryObject));
+        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt())).thenReturn(Arrays.asList(primaryObject));
 
         final List<PersistenceStrategy> daos = persistenceService.find(queryFor(PersistentObjectStub.class).withForeignKey("foreignKeyRef", foreignKeyRef).build());
 
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
+        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt());
         assertThat(daos.contains(primaryObject), equalTo(true));
     }
 
@@ -215,11 +214,11 @@ public final class PersistenceServiceTest
     public void findUnique()
     {
         final PersistenceStrategy a = new PersistentObjectStub("a");
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(a));
+        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt())).thenReturn(Arrays.asList(a));
 
-        final PersistenceStrategy dao = persistenceService.findUnique(queryFor(PersistentObjectStub.class).withField("reference", "a").build());
+        final PersistenceStrategy dao = persistenceService.findUnique(queryFor(PersistentObjectStub.class).withField("fieldName", "a").build());
 
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
+        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt());
         assertThat(dao, equalTo(a));
     }
 
@@ -228,11 +227,11 @@ public final class PersistenceServiceTest
     {
         final PersistenceStrategy a = new PersistentObjectStub("a");
         final PersistenceStrategy b = new PersistentObjectStub("b");
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(a));
+        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt())).thenReturn(Arrays.asList(a));
 
-        final List<PersistenceStrategy> daos = persistenceService.find(queryFor(PersistentObjectStub.class).withField("reference", "a").build());
+        final List<PersistenceStrategy> daos = persistenceService.find(queryFor(PersistentObjectStub.class).withField("fieldName", "a").build());
 
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
+        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt());
         assertThat(daos.contains(a), equalTo(true));
         assertThat(daos.contains(b), equalTo(false));
     }
@@ -243,11 +242,11 @@ public final class PersistenceServiceTest
         final PersistenceStrategy a = new PersistentObjectStub();
         final PersistenceStrategy b = new PersistentObjectStub();
         final List<PersistenceStrategy> objectStubs = Arrays.asList(a, b);
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(objectStubs);
+        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt())).thenReturn(objectStubs);
 
         final List<PersistenceStrategy> daos = persistenceService.find(queryFor(PersistentObjectStub.class).build()); // no criteria
 
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
+        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any(), anyInt(), anyInt());
         assertThat(daos.containsAll(objectStubs), equalTo(true));
     }
 }
