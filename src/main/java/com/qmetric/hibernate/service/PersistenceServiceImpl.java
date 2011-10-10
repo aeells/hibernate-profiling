@@ -2,10 +2,10 @@
 
 package com.qmetric.hibernate.service;
 
-import com.qmetric.hibernate.HibernateQueryWrapper;
 import com.qmetric.hibernate.PersistenceStrategy;
-import com.qmetric.hibernate.QueryLimit;
+import com.qmetric.hibernate.ResultSetLimit;
 import org.apache.commons.lang.Validate;
+import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 import java.util.List;
@@ -53,22 +53,38 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         hibernateTemplate.flush();
     }
 
-    public PersistenceStrategy findUnique(final HibernateQueryWrapper query)
+    public PersistenceStrategy findById(final Class daoClass, final String id)
     {
-        Validate.notNull(query, "query cannot be null reference!");
+        Validate.notNull(daoClass, "class cannot be null!");
+        Validate.notEmpty(id, "id cannot be empty!");
 
-        final QueryLimit limit = query.getLimit();
         //noinspection unchecked
-        return uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria(), limit.getFirstResult(), limit.getMaxResults()));
+        return (PersistenceStrategy) hibernateTemplate.get(daoClass, id);
     }
 
-    public final List<PersistenceStrategy> find(final HibernateQueryWrapper query)
+    public PersistenceStrategy findUnique(final DetachedCriteria criteria)
     {
-        Validate.notNull(query, "query cannot be null reference!");
+        Validate.notNull(criteria, "criteria cannot be null!");
 
-        final QueryLimit limit = query.getLimit();
         //noinspection unchecked
-        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(query.getCriteria(), limit.getFirstResult(), limit.getMaxResults());
+        return uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria));
+    }
+
+    public final List<PersistenceStrategy> find(final DetachedCriteria criteria)
+    {
+        Validate.notNull(criteria, "criteria cannot be null!");
+
+        //noinspection unchecked
+        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria);
+    }
+
+    public final List<PersistenceStrategy> find(final DetachedCriteria criteria, final ResultSetLimit limit)
+    {
+        Validate.notNull(criteria, "criteria cannot be null!");
+        Validate.notNull(limit, "result set limit expected!");
+
+        //noinspection unchecked
+        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria, limit.getFirstResult(), limit.getMaxResults());
     }
 
     // using merge and saveOrUpdate instead of save / update separately to safeguard against detached objects

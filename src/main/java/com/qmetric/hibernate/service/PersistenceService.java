@@ -2,7 +2,8 @@
 
 package com.qmetric.hibernate.service;
 
-import com.qmetric.hibernate.HibernateQueryWrapper;
+import com.qmetric.hibernate.ResultSetLimit;
+import org.hibernate.criterion.DetachedCriteria;
 
 import java.util.List;
 
@@ -19,7 +20,11 @@ public interface PersistenceService<PersistenceStrategy>
 
     void flush();
 
-    PersistenceStrategy findUnique(final HibernateQueryWrapper query);
+    PersistenceStrategy findById(final Class daoClass, final String id);
 
-    List<PersistenceStrategy> find(final HibernateQueryWrapper query);
+    PersistenceStrategy findUnique(final DetachedCriteria criteria);
+
+    List<PersistenceStrategy> find(final DetachedCriteria criteria);
+
+    List<PersistenceStrategy> find(final DetachedCriteria criteria, final ResultSetLimit limit);
 }

@@ -12,7 +12,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.qmetric.hibernate.HibernateQueryWrapper.Builder.queryFor;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -33,7 +32,7 @@ public class PersistenceServiceITest
         final Parent parent = new Parent(1);
         persistAndEvict(parent);
 
-        final Parent loadedParent = persistenceService.findUnique(queryFor(Parent.class).withPrimaryKey("id", parent.getId()).build());
+        final Parent loadedParent = persistenceService.findById(Parent.class, parent.getId());
 
         assertThat(parent.getId(), notNullValue());
         assertThat(loadedParent, equalTo(parent));
@@ -46,7 +45,7 @@ public class PersistenceServiceITest
         parent.addChild(new Child(1, parent));
         persistAndEvict(parent);
 
-        final Parent loadedParent = persistenceService.findUnique(queryFor(Parent.class).withPrimaryKey("id", parent.getId()).build());
+        final Parent loadedParent = persistenceService.findById(Parent.class, parent.getId());
 
         fullyAssertObjectGraph(parent, loadedParent);
     }
@@ -60,7 +59,7 @@ public class PersistenceServiceITest
         parent.addChild(new Child(1, parent));
         persistAndEvict(parent);
 
-        final Parent loadedParent = persistenceService.findUnique(queryFor(Parent.class).withPrimaryKey("id", parent.getId()).build());
+        final Parent loadedParent = persistenceService.findById(Parent.class, parent.getId());
 
         fullyAssertObjectGraph(parent, loadedParent);
     }

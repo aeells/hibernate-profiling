@@ -6,16 +6,13 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class QueryLimit
+public class ResultSetLimit
 {
-    // todo aeells - check that the LIMIT clause is dropped from the SQL query if the null impl instance is used
-    public static final QueryLimit NULL_IMPL = new QueryLimit(0, -1);
-
     private final int firstResult;
 
     private final int maxResults;
 
-    public QueryLimit(final int firstResult, final int maxResults)
+    public ResultSetLimit(final int firstResult, final int maxResults)
     {
         this.firstResult = firstResult;
         this.maxResults = maxResults;
