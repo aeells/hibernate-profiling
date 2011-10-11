@@ -2,7 +2,6 @@
 
 package com.qmetric.hibernate.service;
 
-import com.qmetric.hibernate.ResultSetLimit;
 import org.hibernate.criterion.DetachedCriteria;
 
 import java.util.List;
@@ -24,7 +23,9 @@ public interface PersistenceService<PersistenceStrategy>
 
     PersistenceStrategy findUnique(final DetachedCriteria criteria);
 
+    PersistenceStrategy findFirstOrderedBy(final DetachedCriteria criteria);
+
     List<PersistenceStrategy> find(final DetachedCriteria criteria);
 
-    List<PersistenceStrategy> find(final DetachedCriteria criteria, final ResultSetLimit limit);
+    List<PersistenceStrategy> find(final DetachedCriteria criteria, final int firstResult, final int maxResults);
 }

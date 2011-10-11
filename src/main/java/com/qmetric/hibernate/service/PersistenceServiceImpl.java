@@ -3,7 +3,6 @@
 package com.qmetric.hibernate.service;
 
 import com.qmetric.hibernate.PersistenceStrategy;
-import com.qmetric.hibernate.ResultSetLimit;
 import org.apache.commons.lang.Validate;
 import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -70,6 +69,14 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         return uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria));
     }
 
+    public final PersistenceStrategy findFirstOrderedBy(final DetachedCriteria criteria)
+    {
+        Validate.notNull(criteria, "criteria cannot be null!");
+
+        //noinspection unchecked
+        return uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria, 0, 1));
+    }
+
     public final List<PersistenceStrategy> find(final DetachedCriteria criteria)
     {
         Validate.notNull(criteria, "criteria cannot be null!");
@@ -78,13 +85,12 @@ public class PersistenceServiceImpl implements PersistenceService<PersistenceStr
         return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria);
     }
 
-    public final List<PersistenceStrategy> find(final DetachedCriteria criteria, final ResultSetLimit limit)
+    public final List<PersistenceStrategy> find(final DetachedCriteria criteria, final int firstResult, final int maxResults)
     {
         Validate.notNull(criteria, "criteria cannot be null!");
-        Validate.notNull(limit, "result set limit expected!");
 
         //noinspection unchecked
-        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria, limit.getFirstResult(), limit.getMaxResults());
+        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria, firstResult, maxResults);
     }
 
     // using merge and saveOrUpdate instead of save / update separately to safeguard against detached objects

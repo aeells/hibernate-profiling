@@ -68,12 +68,12 @@ public final class PersistenceProfilingInterceptorTest
     }
 
     @Test
-    public void profileReadDisabledTrigger() throws Throwable
+    public void profileFindDisabledTrigger() throws Throwable
     {
         when(mockLogger.isTraceEnabled()).thenReturn(false);
 
-        profiler.profileRead(mockCall);
-        profiler.profileReads(mockCall);
+        profiler.profileFind(mockCall);
+        profiler.profileFindList(mockCall);
 
         verify(mockCall, times(2)).proceed();
         verify(mockLogger, never()).trace(anyString());
@@ -102,19 +102,19 @@ public final class PersistenceProfilingInterceptorTest
     }
 
     @Test
-    public void profileReadProfilingDomainObject() throws Throwable
+    public void profileFindProfilingDomainObject() throws Throwable
     {
         when(mockLogger.isTraceEnabled()).thenReturn(true);
         when(mockCall.proceed()).thenReturn(new PersistentObjectStub());
 
-        profiler.profileRead(mockCall);
+        profiler.profileFind(mockCall);
 
         verify(mockCall).proceed();
         verify(mockLogger).trace(anyString());
     }
 
     @Test
-    public void profileReadsProfilingDomainObjectList() throws Throwable
+    public void profileFindListProfilingDomainObjectList() throws Throwable
     {
         when(mockLogger.isTraceEnabled()).thenReturn(true);
         final List<PersistenceStrategy> models = new ArrayList<PersistenceStrategy>()
@@ -126,7 +126,7 @@ public final class PersistenceProfilingInterceptorTest
 
         when(mockCall.proceed()).thenReturn(models);
 
-        profiler.profileReads(mockCall);
+        profiler.profileFindList(mockCall);
 
         verify(mockCall).proceed();
         verify(mockLogger).trace(anyString());
@@ -142,7 +142,7 @@ public final class PersistenceProfilingInterceptorTest
         //noinspection ThrowableInstanceNeverThrown
         PowerMockito.when(BeanUtils.getProperty(model, "id")).thenThrow(new RuntimeException());
 
-        profiler.profileRead(mockCall);
+        profiler.profileFind(mockCall);
 
         verify(mockLogger, never()).trace(anyString());
         verify(mockLogger).error(anyString());

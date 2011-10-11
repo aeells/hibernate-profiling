@@ -2,10 +2,9 @@
 
 package com.qmetric.hibernate.service;
 
-import com.qmetric.hibernate.PersistenceStrategy;
 import com.qmetric.hibernate.model.PersistentObjectStub;
 import org.hibernate.criterion.DetachedCriteria;
-import org.junit.Before;
+import org.hibernate.criterion.Order;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -13,10 +12,7 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 import java.util.Arrays;
-import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hibernate.criterion.DetachedCriteria.forClass;
 import static org.hibernate.criterion.Restrictions.eq;
 import static org.junit.Assert.assertNull;
@@ -32,13 +28,7 @@ public final class PersistenceServiceTest
 
     private PersistenceServiceImpl persistenceService = new PersistenceServiceImpl(hibernateTemplate);
 
-    private PersistentObjectStub persistenceStrategy;
-
-    @Before
-    public void context()
-    {
-        persistenceStrategy = new PersistentObjectStub();
-    }
+    private PersistentObjectStub persistenceStrategy = new PersistentObjectStub();
 
     @Test
     public void shouldNotFailWhenAttemptingToPersistNull()
@@ -59,31 +49,13 @@ public final class PersistenceServiceTest
     }
 
     @Test
-    public void shouldDeleteWhenDeleteIsEnabled()
+    public void shouldPersistWhenCreateIsEnabled()
     {
-        persistenceStrategy.delete = true;
+        persistenceStrategy.create = true;
 
-        persistenceService.delete(persistenceStrategy);
+        persistenceService.create(persistenceStrategy);
 
-        verify(hibernateTemplate, times(1)).delete(persistenceStrategy);
-    }
-
-    @Test
-    public void shouldNotFailWhenAttemptingToDeleteNull()
-    {
-        persistenceService.delete(null);
-
-        verify(hibernateTemplate, times(0)).delete(Matchers.<Object>anyObject());
-    }
-
-    @Test
-    public void shouldNotDeleteWhenDeleteIsDisabled()
-    {
-        persistenceStrategy.delete = false;
-
-        persistenceService.delete(persistenceStrategy);
-
-        verify(hibernateTemplate, times(0)).delete(persistenceStrategy);
+        verify(hibernateTemplate, times(1)).saveOrUpdate(persistenceStrategy);
     }
 
     @Test
@@ -115,13 +87,42 @@ public final class PersistenceServiceTest
     }
 
     @Test
-    public void shouldPersistWhenCreateIsEnabled()
+    public void shouldMergeWhenObjectPresentInSessionCache()
     {
-        persistenceStrategy.create = true;
+        persistenceStrategy.update = true;
+        when(hibernateTemplate.contains(persistenceStrategy)).thenReturn(true);
 
-        persistenceService.create(persistenceStrategy);
+        persistenceService.update(persistenceStrategy);
 
-        verify(hibernateTemplate, times(1)).saveOrUpdate(persistenceStrategy);
+        verify(hibernateTemplate).merge(persistenceStrategy);
+    }
+
+    @Test
+    public void shouldDeleteWhenDeleteIsEnabled()
+    {
+        persistenceStrategy.delete = true;
+
+        persistenceService.delete(persistenceStrategy);
+
+        verify(hibernateTemplate, times(1)).delete(persistenceStrategy);
+    }
+
+    @Test
+    public void shouldNotFailWhenAttemptingToDeleteNull()
+    {
+        persistenceService.delete(null);
+
+        verify(hibernateTemplate, times(0)).delete(Matchers.<Object>anyObject());
+    }
+
+    @Test
+    public void shouldNotDeleteWhenDeleteIsDisabled()
+    {
+        persistenceStrategy.delete = false;
+
+        persistenceService.delete(persistenceStrategy);
+
+        verify(hibernateTemplate, times(0)).delete(persistenceStrategy);
     }
 
     @Test
@@ -133,15 +134,60 @@ public final class PersistenceServiceTest
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void findByPrimaryKeyThrowsExceptionWithNullDaoClass()
+    public void findByIdThrowsExceptionWithNullDaoClass()
     {
         persistenceService.findById(null, "1234");
+    }
+
+    @Test
+    public void findById()
+    {
+        persistenceService.findById(PersistentObjectStub.class, "1234");
+
+        verify(hibernateTemplate).get(PersistentObjectStub.class, "1234");
+    }
+
+    @Test
+    public void findByIdShouldSuccessfullyHandleNotFindingAnything()
+    {
+        //noinspection unchecked
+        when(hibernateTemplate.get(Mockito.<Class>any(), anyString())).thenReturn(null);
+
+        assertNull(persistenceService.findById(PersistentObjectStub.class, "1234"));
+        verify(hibernateTemplate).get(PersistentObjectStub.class, "1234");
     }
 
     @Test(expected = Exception.class)
     public void findUniqueShouldThrowExceptionWithNullDaoClass()
     {
         persistenceService.findUnique(null);
+    }
+
+    @Test(expected = IncorrectResultSizeDataAccessException.class)
+    public void findUniqueShouldThrowUniqueExceptionWhenReturningMoreThanOneResult()
+    {
+        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(new PersistentObjectStub(), new PersistentObjectStub()));
+
+        persistenceService.findUnique(forClass(PersistentObjectStub.class));
+    }
+
+    @Test
+    public void findUnique()
+    {
+        final DetachedCriteria criteria = forClass(PersistentObjectStub.class).add(eq("fieldName", "a"));
+
+        persistenceService.findUnique(criteria);
+
+        verify(hibernateTemplate).findByCriteria(criteria);
+    }
+
+    @Test
+    public void findFirstOrderedBy()
+    {
+        final DetachedCriteria criteria = forClass(PersistentObjectStub.class).addOrder(Order.asc("fieldName"));
+        persistenceService.findFirstOrderedBy(criteria);
+
+        verify(hibernateTemplate).findByCriteria(criteria, 0, 1);
     }
 
     @Test(expected = Exception.class)
@@ -151,90 +197,22 @@ public final class PersistenceServiceTest
     }
 
     @Test
-    public void findByPrimaryKey()
-    {
-        final PersistentObjectStub primaryObject = new PersistentObjectStub();
-
-        //noinspection unchecked
-        when(hibernateTemplate.get(Mockito.<Class>any(), anyString())).thenReturn(primaryObject);
-
-        final PersistenceStrategy dao = persistenceService.findById(PersistentObjectStub.class, "1234");
-
-        verify(hibernateTemplate).get(PersistentObjectStub.class, "1234");
-        assertThat(primaryObject, equalTo(dao));
-    }
-
-    @Test
-    public void shouldSuccessfullyHandleNotFindingByPrimaryKey()
-    {
-        //noinspection unchecked
-        when(hibernateTemplate.get(Mockito.<Class>any(), anyString())).thenReturn(null);
-
-        final PersistenceStrategy dao = persistenceService.findById(PersistentObjectStub.class, "1234");
-
-        verify(hibernateTemplate).get(PersistentObjectStub.class, "1234");
-        assertNull(dao);
-    }
-
-    @Test(expected = IncorrectResultSizeDataAccessException.class)
-    public void shouldThrowUniqueExceptionWhenFindUniqueReturnsMoreThanOneResult()
-    {
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(new PersistentObjectStub(), new PersistentObjectStub()));
-
-        persistenceService.findUnique(forClass(PersistentObjectStub.class));
-    }
-
-    @Test
-    public void findByForeignKey()
-    {
-        final PersistenceStrategy foreignKeyRef = new PersistentObjectStub();
-        final PersistenceStrategy primaryObject = new PersistentObjectStub(foreignKeyRef);
-
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(primaryObject));
-
-        final List<PersistenceStrategy> daos = persistenceService.find(forClass(PersistentObjectStub.class).add(eq("foreignKeyRef", foreignKeyRef)));
-
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
-        assertThat(daos.contains(primaryObject), equalTo(true));
-    }
-
-    @Test
-    public void findUnique()
-    {
-        final PersistenceStrategy a = new PersistentObjectStub("a");
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(a));
-
-        final PersistenceStrategy dao = persistenceService.findUnique(forClass(PersistentObjectStub.class).add(eq("fieldName", "a")));
-
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
-        assertThat(dao, equalTo(a));
-    }
-
-    @Test
     public void find()
     {
-        final PersistenceStrategy a = new PersistentObjectStub("a");
-        final PersistenceStrategy b = new PersistentObjectStub("b");
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(a));
+        final DetachedCriteria criteria = forClass(PersistentObjectStub.class).add(eq("fieldName", "a"));
 
-        final List<PersistenceStrategy> daos = persistenceService.find(forClass(PersistentObjectStub.class).add(eq("fieldName", "a")));
+        persistenceService.find(criteria);
 
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
-        assertThat(daos.contains(a), equalTo(true));
-        assertThat(daos.contains(b), equalTo(false));
+        verify(hibernateTemplate).findByCriteria(criteria);
     }
 
     @Test
-    public void fullTableScan()
+    public void findLimit()
     {
-        final PersistenceStrategy a = new PersistentObjectStub();
-        final PersistenceStrategy b = new PersistentObjectStub();
-        final List<PersistenceStrategy> objectStubs = Arrays.asList(a, b);
-        when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(objectStubs);
+        final DetachedCriteria criteria = forClass(PersistentObjectStub.class).add(eq("fieldName", "a"));
 
-        final List<PersistenceStrategy> daos = persistenceService.find(forClass(PersistentObjectStub.class)); // no criteria
+        persistenceService.find(criteria, 10, 20);
 
-        verify(hibernateTemplate).findByCriteria(Mockito.<DetachedCriteria>any());
-        assertThat(daos.containsAll(objectStubs), equalTo(true));
+        verify(hibernateTemplate).findByCriteria(criteria, 10, 20);
     }
 }

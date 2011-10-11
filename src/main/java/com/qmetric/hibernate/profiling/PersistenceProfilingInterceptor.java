@@ -41,7 +41,7 @@ public final class PersistenceProfilingInterceptor
         }
     }
 
-    public Object profileRead(final ProceedingJoinPoint call) throws Throwable
+    public Object profileFind(final ProceedingJoinPoint call) throws Throwable
     {
         if (LOGGER.isTraceEnabled())
         {
@@ -56,7 +56,7 @@ public final class PersistenceProfilingInterceptor
         }
     }
 
-    public Object profileReads(final ProceedingJoinPoint call) throws Throwable
+    public Object profileFindList(final ProceedingJoinPoint call) throws Throwable
     {
         if (LOGGER.isTraceEnabled())
         {
