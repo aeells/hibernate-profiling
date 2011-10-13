@@ -1,9 +1,8 @@
 package com.qmetric.hibernate.model;
 
-import com.qmetric.hibernate.PersistenceStrategy;
-import com.qmetric.hibernate.profiling.PersistenceProfiled;
+import com.qmetric.hibernate.profiling.HibernateProfiled;
 
-@PersistenceProfiled public class PersistentObjectStub extends AbstractPersistentObject
+@HibernateProfiled public class PersistentObjectStub extends AbstractPersistentObject
 {
     public boolean create;
 
@@ -11,7 +10,7 @@ import com.qmetric.hibernate.profiling.PersistenceProfiled;
 
     public boolean delete;
 
-    private PersistenceStrategy foreignKeyRef;
+    private PersistentObjectStub foreignKeyRef;
 
     private String fieldName;
 
@@ -19,7 +18,7 @@ import com.qmetric.hibernate.profiling.PersistenceProfiled;
     {
     }
 
-    public PersistentObjectStub(final PersistenceStrategy foreignKeyRef)
+    public PersistentObjectStub(final PersistentObjectStub foreignKeyRef)
     {
         this.foreignKeyRef = foreignKeyRef;
     }
@@ -30,24 +29,24 @@ import com.qmetric.hibernate.profiling.PersistenceProfiled;
     }
 
     @Override
-    public boolean isCreatable()
+    public boolean isCreateAllowed()
     {
         return create;
     }
 
     @Override
-    public boolean isUpdateable()
+    public boolean isUpdateAllowed()
     {
         return update;
     }
 
     @Override
-    public boolean isDeletable()
+    public boolean isDeleteAllowed()
     {
         return delete;
     }
 
-    public PersistenceStrategy getForeignKeyRef()
+    public PersistentObjectStub getForeignKeyRef()
     {
         return foreignKeyRef;
     }

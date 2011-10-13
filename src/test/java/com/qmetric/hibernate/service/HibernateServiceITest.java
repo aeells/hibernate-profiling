@@ -18,10 +18,10 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {"classpath:spring-test-context.xml"})
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true) @Transactional
-public class PersistenceServiceITest
+public class HibernateServiceITest
 {
     @Autowired
-    private PersistenceService<Parent> persistenceService;
+    private HibernateService<Parent> hibernateService;
 
     @Autowired
     private HibernateTemplate hibernateTemplate;
@@ -32,7 +32,7 @@ public class PersistenceServiceITest
         final Parent parent = new Parent(1);
         persistAndEvict(parent);
 
-        final Parent loadedParent = persistenceService.findById(Parent.class, parent.getId());
+        final Parent loadedParent = hibernateService.findById(Parent.class, parent.getId());
 
         assertThat(parent.getId(), notNullValue());
         assertThat(loadedParent, equalTo(parent));
@@ -45,7 +45,7 @@ public class PersistenceServiceITest
         parent.addChild(new Child(1, parent));
         persistAndEvict(parent);
 
-        final Parent loadedParent = persistenceService.findById(Parent.class, parent.getId());
+        final Parent loadedParent = hibernateService.findById(Parent.class, parent.getId());
 
         fullyAssertObjectGraph(parent, loadedParent);
     }
@@ -59,7 +59,7 @@ public class PersistenceServiceITest
         parent.addChild(new Child(1, parent));
         persistAndEvict(parent);
 
-        final Parent loadedParent = persistenceService.findById(Parent.class, parent.getId());
+        final Parent loadedParent = hibernateService.findById(Parent.class, parent.getId());
 
         fullyAssertObjectGraph(parent, loadedParent);
     }
@@ -76,7 +76,7 @@ public class PersistenceServiceITest
 
     private void persistAndEvict(final Parent parent)
     {
-        persistenceService.create(parent);
+        hibernateService.create(parent);
 
         hibernateTemplate.flush();
         hibernateTemplate.evict(parent);

@@ -1,6 +1,8 @@
 package com.qmetric.hibernate.model;
 
-import com.qmetric.hibernate.PersistenceStrategy;
+import com.qmetric.hibernate.Createable;
+import com.qmetric.hibernate.Deleteable;
+import com.qmetric.hibernate.Updateable;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -17,7 +19,7 @@ import javax.persistence.Version;
  * A reference implementation of PersistenceStrategy.
  */
 @MappedSuperclass
-public abstract class AbstractPersistentObject implements PersistenceStrategy
+public abstract class AbstractPersistentObject implements Createable, Updateable, Deleteable
 {
     @Id @GeneratedValue(generator = "system-uuid") @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
@@ -30,17 +32,17 @@ public abstract class AbstractPersistentObject implements PersistenceStrategy
         return id;
     }
 
-    @Override public boolean isCreatable()
+    @Override public boolean isCreateAllowed()
     {
         return true;
     }
 
-    @Override public boolean isUpdateable()
+    @Override public boolean isUpdateAllowed()
     {
         return true;
     }
 
-    @Override public boolean isDeletable()
+    @Override public boolean isDeleteAllowed()
     {
         return true;
     }

@@ -9,12 +9,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates this class will be intercepted and profiled when passed to the Persistence framework.
+ * Indicates this class will be intercepted and profiled when passed to the Hibernate service.
  */
 @Documented
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PersistenceProfiled
+public @interface HibernateProfiled
 {
     String identifier() default "id";
 }

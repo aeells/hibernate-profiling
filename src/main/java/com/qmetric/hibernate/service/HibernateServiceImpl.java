@@ -2,7 +2,9 @@
 
 package com.qmetric.hibernate.service;
 
-import com.qmetric.hibernate.PersistenceStrategy;
+import com.qmetric.hibernate.Createable;
+import com.qmetric.hibernate.Deleteable;
+import com.qmetric.hibernate.Updateable;
 import org.apache.commons.lang.Validate;
 import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -14,87 +16,82 @@ import static org.springframework.dao.support.DataAccessUtils.uniqueResult;
 /**
  * Standardised database repository access implementation.
  */
-public class PersistenceServiceImpl implements PersistenceService<PersistenceStrategy>
+public final class HibernateServiceImpl<T> implements HibernateService
 {
     private final HibernateTemplate hibernateTemplate;
 
-    public PersistenceServiceImpl(final HibernateTemplate hibernateTemplate)
+    public HibernateServiceImpl(final HibernateTemplate hibernateTemplate)
     {
         this.hibernateTemplate = hibernateTemplate;
     }
 
-    @Override public final void create(final PersistenceStrategy model)
+    @Override public final void create(final Createable model)
     {
-        if (model != null && model.isCreatable())
+        if (model != null && model.isCreateAllowed())
         {
             saveOrUpdate(model);
         }
     }
 
-    @Override public final void update(final PersistenceStrategy model)
+    @Override public final void update(final Updateable model)
     {
-        if (model != null && model.isUpdateable())
+        if (model != null && model.isUpdateAllowed())
         {
             saveOrUpdate(model);
         }
     }
 
-    @Override public final void delete(final PersistenceStrategy model)
+    @Override public final void delete(final Deleteable model)
     {
-        if (model != null && model.isDeletable())
+        if (model != null && model.isDeleteAllowed())
         {
             hibernateTemplate.delete(model);
         }
     }
 
-    @Override public void flush()
-    {
-        hibernateTemplate.flush();
-    }
-
-    public PersistenceStrategy findById(final Class daoClass, final String id)
+    public final T findById(final Class daoClass, final String id)
     {
         Validate.notNull(daoClass, "class cannot be null!");
         Validate.notEmpty(id, "id cannot be empty!");
 
         //noinspection unchecked
-        return (PersistenceStrategy) hibernateTemplate.get(daoClass, id);
+        return (T) hibernateTemplate.get(daoClass, id);
     }
 
-    public PersistenceStrategy findUnique(final DetachedCriteria criteria)
+    public final T findUnique(final DetachedCriteria criteria)
     {
         Validate.notNull(criteria, "criteria cannot be null!");
 
         //noinspection unchecked
-        return uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria));
+        return uniqueResult((List<T>) hibernateTemplate.findByCriteria(criteria));
     }
 
-    public final PersistenceStrategy findFirstOrderedBy(final DetachedCriteria criteria)
+    public final T findFirstOrderedBy(final DetachedCriteria criteria)
     {
         Validate.notNull(criteria, "criteria cannot be null!");
 
         //noinspection unchecked
-        return uniqueResult((List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria, 0, 1));
+        return uniqueResult((List<T>) hibernateTemplate.findByCriteria(criteria, 0, 1));
     }
 
-    public final List<PersistenceStrategy> find(final DetachedCriteria criteria)
+    public final List<T> find(final DetachedCriteria criteria)
     {
         Validate.notNull(criteria, "criteria cannot be null!");
 
         //noinspection unchecked
-        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria);
+        return (List<T>) hibernateTemplate.findByCriteria(criteria);
     }
 
-    public final List<PersistenceStrategy> find(final DetachedCriteria criteria, final int firstResult, final int maxResults)
+    public final List<T> find(final DetachedCriteria criteria, final int firstResult, final int maxResults)
     {
         Validate.notNull(criteria, "criteria cannot be null!");
 
         //noinspection unchecked
-        return (List<PersistenceStrategy>) hibernateTemplate.findByCriteria(criteria, firstResult, maxResults);
+        return (List<T>) hibernateTemplate.findByCriteria(criteria, firstResult, maxResults);
     }
 
     // using merge and saveOrUpdate instead of save / update separately to safeguard against detached objects
-    private void saveOrUpdate(final PersistenceStrategy model)
+    private void saveOrUpdate(final Object model)
     {
         if (hibernateTemplate.contains(model))
         {

@@ -2,7 +2,6 @@
 
 package com.qmetric.hibernate.profiling;
 
-import com.qmetric.hibernate.PersistenceStrategy;
 import com.qmetric.hibernate.model.AbstractPersistentObject;
 import com.qmetric.hibernate.model.PersistentObjectStub;
 import com.qmetric.utilities.time.DateTimeSource;
@@ -31,8 +30,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class) @PrepareForTest({Appender.class, BeanUtils.class})
-@SuppressStaticInitializationFor("com.qmetric.hibernate.profiling.PersistenceProfilingInterceptor")
-public final class PersistenceProfilingInterceptorTest
+@SuppressStaticInitializationFor("com.qmetric.hibernate.profiling.HibernateProfilingInterceptor")
+public final class HibernateProfilingInterceptorTest
 {
     private final ProceedingJoinPoint mockCall = mock(ProceedingJoinPoint.class);
 
@@ -40,16 +39,16 @@ public final class PersistenceProfilingInterceptorTest
 
     private final Signature mockSignature = mock(Signature.class);
 
-    private final PersistenceStrategy mockPersistenceStrategy = mock(PersistenceStrategy.class);
+    private final Object mockPersistenceStrategy = mock(Object.class);
 
     private final DateTimeSource mockDateTimeSource = mock(DateTimeSource.class);
 
-    private PersistenceProfilingInterceptor profiler = new PersistenceProfilingInterceptor(mockDateTimeSource);
+    private HibernateProfilingInterceptor profiler = new HibernateProfilingInterceptor(mockDateTimeSource);
 
     @Before
     public void initialise() throws Throwable
     {
-        Whitebox.setInternalState(PersistenceProfilingInterceptor.class, mockLogger);
+        Whitebox.setInternalState(HibernateProfilingInterceptor.class, mockLogger);
 
         when(mockCall.getSignature()).thenReturn(mockSignature);
         when(mockSignature.getDeclaringType()).thenReturn(Class.class);
@@ -117,7 +116,7 @@ public final class PersistenceProfilingInterceptorTest
     public void profileFindListProfilingDomainObjectList() throws Throwable
     {
         when(mockLogger.isTraceEnabled()).thenReturn(true);
-        final List<PersistenceStrategy> models = new ArrayList<PersistenceStrategy>()
+        final List<Object> models = new ArrayList<Object>()
         {
             {
                 this.add(new PersistentObjectStub());
@@ -136,7 +135,7 @@ public final class PersistenceProfilingInterceptorTest
     public void logReflectionErrors() throws Throwable
     {
         when(mockLogger.isTraceEnabled()).thenReturn(true);
-        final PersistenceStrategy model = new PersistentObjectStub();
+        final Object model = new PersistentObjectStub();
         when(mockCall.proceed()).thenReturn(model);
         PowerMockito.mockStatic(BeanUtils.class);
         //noinspection ThrowableInstanceNeverThrown

@@ -2,7 +2,6 @@
 
 package com.qmetric.hibernate.profiling;
 
-import com.qmetric.hibernate.PersistenceStrategy;
 import com.qmetric.utilities.time.DateTimeSource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -16,18 +15,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 // Log4j configuration (TRACE) triggers whether performance statistics are recorded
-public final class PersistenceProfilingInterceptor
+public final class HibernateProfilingInterceptor
 {
-    private static final Logger LOGGER = Logger.getLogger(PersistenceProfilingInterceptor.class);
+    private static final Logger LOGGER = Logger.getLogger(HibernateProfilingInterceptor.class);
 
     private final DateTimeSource dateTimeSource;
 
-    @Autowired public PersistenceProfilingInterceptor(final DateTimeSource dateTimeSource)
+    @Autowired public HibernateProfilingInterceptor(final DateTimeSource dateTimeSource)
     {
         this.dateTimeSource = dateTimeSource;
     }
 
-    public void profileWrites(final ProceedingJoinPoint call, final PersistenceStrategy model) throws Throwable
+    public void profileWrites(final ProceedingJoinPoint call, final Object model) throws Throwable
     {
         if (LOGGER.isTraceEnabled())
         {
@@ -46,7 +45,7 @@ public final class PersistenceProfilingInterceptor
         if (LOGGER.isTraceEnabled())
         {
             final DateTime start = dateTimeSource.now();
-            final PersistenceStrategy model = (PersistenceStrategy) call.proceed();
+            final Object model = call.proceed();
             logProfileCall(call, model, (new Duration(start, dateTimeSource.now()).getMillis()));
             return model;
         }
@@ -61,7 +60,7 @@ public final class PersistenceProfilingInterceptor
         if (LOGGER.isTraceEnabled())
         {
             final DateTime start = dateTimeSource.now();
-            @SuppressWarnings({"unchecked"}) final List<PersistenceStrategy> models = (List<PersistenceStrategy>) call.proceed();
+            @SuppressWarnings({"unchecked"}) final List<Object> models = (List<Object>) call.proceed();
             logProfileCall(call, models, (new Duration(start, dateTimeSource.now()).getMillis()));
             return models;
         }
@@ -71,10 +70,10 @@ public final class PersistenceProfilingInterceptor
         }
     }
 
-    private void logProfileCall(final ProceedingJoinPoint call, final PersistenceStrategy model, final long duration)
+    private void logProfileCall(final ProceedingJoinPoint call, final Object model, final long duration)
     {
         // model is null on login
-        if (model != null && model.getClass().isAnnotationPresent(PersistenceProfiled.class))
+        if (model != null && model.getClass().isAnnotationPresent(HibernateProfiled.class))
         {
             try
             {
@@ -88,7 +87,7 @@ public final class PersistenceProfilingInterceptor
         }
     }
 
-    private void logProfileCall(final ProceedingJoinPoint call, final List<PersistenceStrategy> models, final long duration)
+    private void logProfileCall(final ProceedingJoinPoint call, final List<Object> models, final long duration)
     {
         if (models != null && !models.isEmpty())
         {
@@ -97,18 +96,18 @@ public final class PersistenceProfilingInterceptor
         }
     }
 
-    private String getClassNameAndPersistentId(final PersistenceStrategy model) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException
+    private String getClassNameAndPersistentId(final Object model) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException
     {
-        final String identifier = model.getClass().getAnnotation(PersistenceProfiled.class).identifier();
+        final String identifier = model.getClass().getAnnotation(HibernateProfiled.class).identifier();
         return new StringBuilder(model.getClass().getSimpleName()).append("|").append(BeanUtils.getProperty(model, identifier)).toString();
     }
 
-    private String getClassNameAndPersistentIds(final List<PersistenceStrategy> models)
+    private String getClassNameAndPersistentIds(final List<Object> models)
     {
         final StringBuilder sb = new StringBuilder();
-        for (final PersistenceStrategy model : models)
+        for (final Object model : models)
         {
-            if (model.getClass().isAnnotationPresent(PersistenceProfiled.class))
+            if (model.getClass().isAnnotationPresent(HibernateProfiled.class))
             {
                 if (sb.length() == 0)
                 {
@@ -117,7 +116,7 @@ public final class PersistenceProfilingInterceptor
 
                 try
                 {
-                    sb.append(BeanUtils.getProperty(model, model.getClass().getAnnotation(PersistenceProfiled.class).identifier())).append("|");
+                    sb.append(BeanUtils.getProperty(model, model.getClass().getAnnotation(HibernateProfiled.class).identifier())).append("|");
                 }
                 catch (final Exception e)
                 {

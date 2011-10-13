@@ -22,18 +22,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public final class PersistenceServiceTest
+public final class HibernateServiceTest
 {
     private HibernateTemplate hibernateTemplate = mock(HibernateTemplate.class);
 
-    private PersistenceServiceImpl persistenceService = new PersistenceServiceImpl(hibernateTemplate);
+    private HibernateServiceImpl hibernateService = new HibernateServiceImpl(hibernateTemplate);
 
-    private PersistentObjectStub persistenceStrategy = new PersistentObjectStub();
+    private PersistentObjectStub stub = new PersistentObjectStub();
 
     @Test
     public void shouldNotFailWhenAttemptingToPersistNull()
     {
-        persistenceService.create(null);
+        hibernateService.create(null);
 
         verify(hibernateTemplate, times(0)).saveOrUpdate(Matchers.<Object>anyObject());
     }
@@ -41,37 +41,37 @@ public final class PersistenceServiceTest
     @Test
     public void shouldNotPersistWhenCreateIsDisabled()
     {
-        persistenceStrategy.create = false;
+        stub.create = false;
 
-        persistenceService.create(persistenceStrategy);
+        hibernateService.create(stub);
 
-        verify(hibernateTemplate, times(0)).saveOrUpdate(persistenceStrategy);
+        verify(hibernateTemplate, times(0)).saveOrUpdate(stub);
     }
 
     @Test
     public void shouldPersistWhenCreateIsEnabled()
     {
-        persistenceStrategy.create = true;
+        stub.create = true;
 
-        persistenceService.create(persistenceStrategy);
+        hibernateService.create(stub);
 
-        verify(hibernateTemplate, times(1)).saveOrUpdate(persistenceStrategy);
+        verify(hibernateTemplate, times(1)).saveOrUpdate(stub);
     }
 
     @Test
     public void shouldUpdateWhenUpdateIsEnabled()
     {
-        persistenceStrategy.update = true;
+        stub.update = true;
 
-        persistenceService.update(persistenceStrategy);
+        hibernateService.update(stub);
 
-        verify(hibernateTemplate, times(1)).saveOrUpdate(persistenceStrategy);
+        verify(hibernateTemplate, times(1)).saveOrUpdate(stub);
     }
 
     @Test
     public void shouldNotFailWhenAttemptingToUpdateNull()
     {
-        persistenceService.update(null);
+        hibernateService.update(null);
 
         verify(hibernateTemplate, times(0)).saveOrUpdate(Matchers.<Object>anyObject());
     }
@@ -79,38 +79,38 @@ public final class PersistenceServiceTest
     @Test
     public void shouldNotUpdateWhenUpdateIsDisabled()
     {
-        persistenceStrategy.update = false;
+        stub.update = false;
 
-        persistenceService.update(persistenceStrategy);
+        hibernateService.update(stub);
 
-        verify(hibernateTemplate, times(0)).saveOrUpdate(persistenceStrategy);
+        verify(hibernateTemplate, times(0)).saveOrUpdate(stub);
     }
 
     @Test
     public void shouldMergeWhenObjectPresentInSessionCache()
     {
-        persistenceStrategy.update = true;
-        when(hibernateTemplate.contains(persistenceStrategy)).thenReturn(true);
+        stub.update = true;
+        when(hibernateTemplate.contains(stub)).thenReturn(true);
 
-        persistenceService.update(persistenceStrategy);
+        hibernateService.update(stub);
 
-        verify(hibernateTemplate).merge(persistenceStrategy);
+        verify(hibernateTemplate).merge(stub);
     }
 
     @Test
     public void shouldDeleteWhenDeleteIsEnabled()
     {
-        persistenceStrategy.delete = true;
+        stub.delete = true;
 
-        persistenceService.delete(persistenceStrategy);
+        hibernateService.delete(stub);
 
-        verify(hibernateTemplate, times(1)).delete(persistenceStrategy);
+        verify(hibernateTemplate, times(1)).delete(stub);
     }
 
     @Test
     public void shouldNotFailWhenAttemptingToDeleteNull()
     {
-        persistenceService.delete(null);
+        hibernateService.delete(null);
 
         verify(hibernateTemplate, times(0)).delete(Matchers.<Object>anyObject());
     }
@@ -118,31 +118,23 @@ public final class PersistenceServiceTest
     @Test
     public void shouldNotDeleteWhenDeleteIsDisabled()
     {
-        persistenceStrategy.delete = false;
+        stub.delete = false;
 
-        persistenceService.delete(persistenceStrategy);
+        hibernateService.delete(stub);
 
-        verify(hibernateTemplate, times(0)).delete(persistenceStrategy);
-    }
-
-    @Test
-    public void shouldFlushHibernateSession()
-    {
-        persistenceService.flush();
-
-        verify(hibernateTemplate).flush();
+        verify(hibernateTemplate, times(0)).delete(stub);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void findByIdThrowsExceptionWithNullDaoClass()
     {
-        persistenceService.findById(null, "1234");
+        hibernateService.findById(null, "1234");
     }
 
     @Test
     public void findById()
     {
-        persistenceService.findById(PersistentObjectStub.class, "1234");
+        hibernateService.findById(PersistentObjectStub.class, "1234");
 
         verify(hibernateTemplate).get(PersistentObjectStub.class, "1234");
     }
@@ -153,14 +145,14 @@ public final class PersistenceServiceTest
         //noinspection unchecked
         when(hibernateTemplate.get(Mockito.<Class>any(), anyString())).thenReturn(null);
 
-        assertNull(persistenceService.findById(PersistentObjectStub.class, "1234"));
+        assertNull(hibernateService.findById(PersistentObjectStub.class, "1234"));
         verify(hibernateTemplate).get(PersistentObjectStub.class, "1234");
     }
 
     @Test(expected = Exception.class)
     public void findUniqueShouldThrowExceptionWithNullDaoClass()
     {
-        persistenceService.findUnique(null);
+        hibernateService.findUnique(null);
     }
 
     @Test(expected = IncorrectResultSizeDataAccessException.class)
@@ -168,7 +160,7 @@ public final class PersistenceServiceTest
     {
         when(hibernateTemplate.findByCriteria(Mockito.<DetachedCriteria>any())).thenReturn(Arrays.asList(new PersistentObjectStub(), new PersistentObjectStub()));
 
-        persistenceService.findUnique(forClass(PersistentObjectStub.class));
+        hibernateService.findUnique(forClass(PersistentObjectStub.class));
     }
 
     @Test
@@ -176,7 +168,7 @@ public final class PersistenceServiceTest
     {
         final DetachedCriteria criteria = forClass(PersistentObjectStub.class).add(eq("fieldName", "a"));
 
-        persistenceService.findUnique(criteria);
+        hibernateService.findUnique(criteria);
 
         verify(hibernateTemplate).findByCriteria(criteria);
     }
@@ -185,7 +177,7 @@ public final class PersistenceServiceTest
     public void findFirstOrderedBy()
     {
         final DetachedCriteria criteria = forClass(PersistentObjectStub.class).addOrder(Order.asc("fieldName"));
-        persistenceService.findFirstOrderedBy(criteria);
+        hibernateService.findFirstOrderedBy(criteria);
 
         verify(hibernateTemplate).findByCriteria(criteria, 0, 1);
     }
@@ -193,7 +185,7 @@ public final class PersistenceServiceTest
     @Test(expected = Exception.class)
     public void findShouldThrowExceptionWithNullDaoClass()
     {
-        persistenceService.find(null);
+        hibernateService.find(null);
     }
 
     @Test
@@ -201,7 +193,7 @@ public final class PersistenceServiceTest
     {
         final DetachedCriteria criteria = forClass(PersistentObjectStub.class).add(eq("fieldName", "a"));
 
-        persistenceService.find(criteria);
+        hibernateService.find(criteria);
 
         verify(hibernateTemplate).findByCriteria(criteria);
     }
@@ -211,7 +203,7 @@ public final class PersistenceServiceTest
     {
         final DetachedCriteria criteria = forClass(PersistentObjectStub.class).add(eq("fieldName", "a"));
 
-        persistenceService.find(criteria, 10, 20);
+        hibernateService.find(criteria, 10, 20);
 
         verify(hibernateTemplate).findByCriteria(criteria, 10, 20);
     }
