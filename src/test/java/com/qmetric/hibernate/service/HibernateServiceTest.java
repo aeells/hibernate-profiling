@@ -87,17 +87,6 @@ public final class HibernateServiceTest
     }
 
     @Test
-    public void shouldMergeWhenObjectPresentInSessionCache()
-    {
-        stub.update = true;
-        when(hibernateTemplate.contains(stub)).thenReturn(true);
-
-        hibernateService.update(stub);
-
-        verify(hibernateTemplate).merge(stub);
-    }
-
-    @Test
     public void shouldDeleteWhenDeleteIsEnabled()
     {
         stub.delete = true;

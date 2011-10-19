@@ -29,7 +29,7 @@ public final class HibernateServiceImpl<T> implements HibernateService
     {
         if (model != null && model.isCreateAllowed())
         {
-            saveOrUpdate(model);
+            hibernateTemplate.saveOrUpdate(model);
         }
     }
 
@@ -37,7 +37,7 @@ public final class HibernateServiceImpl<T> implements HibernateService
     {
         if (model != null && model.isUpdateAllowed())
         {
-            saveOrUpdate(model);
+            hibernateTemplate.saveOrUpdate(model);
         }
     }
 
@@ -88,18 +88,5 @@ public final class HibernateServiceImpl<T> implements HibernateService
 
         //noinspection unchecked
         return (List<T>) hibernateTemplate.findByCriteria(criteria, firstResult, maxResults);
-    }
-
-    // using merge and saveOrUpdate instead of save / update separately to safeguard against detached objects
-    private void saveOrUpdate(final Object model)
-    {
-        if (hibernateTemplate.contains(model))
-        {
-            hibernateTemplate.merge(model);
-        }
-        else
-        {
-            hibernateTemplate.saveOrUpdate(model);
-        }
     }
 }
