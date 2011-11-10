@@ -15,6 +15,7 @@
         <aspectj.version>1.6.8</aspectj.version>
         <commons-lang.version>2.5</commons-lang.version>
         <commons-beanutils.version>1.8.3</commons-beanutils.version>
+        <hamcrest.version>1.1</hamcrest.version>
         <hibernate-annotations.version>3.4.0.GA</hibernate-annotations.version>
         <hibernate-core.version>3.3.2.GA</hibernate-core.version>
         <joda-time-hibernate.version>1.2</joda-time-hibernate.version>
@@ -166,6 +167,13 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
 
