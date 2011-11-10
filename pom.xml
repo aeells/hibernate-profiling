@@ -17,9 +17,10 @@
         <commons-beanutils.version>1.8.3</commons-beanutils.version>
         <hibernate-annotations.version>3.4.0.GA</hibernate-annotations.version>
         <hibernate-core.version>3.3.2.GA</hibernate-core.version>
+        <joda-time-hibernate.version>1.2</joda-time-hibernate.version>
         <log4j.version>1.2.15</log4j.version>
-        <qmg-utilities.testing.version>1.59</qmg-utilities.testing.version>
-        <qmg-utilities.utilities.version>1.59</qmg-utilities.utilities.version>
+        <qmg-utilities.testing.version>2.3</qmg-utilities.testing.version>
+        <qmg-utilities.utilities.version>2.3</qmg-utilities.utilities.version>
         <springframework.version>3.0.3.RELEASE</springframework.version>
         <!-- test dependencies -->
         <junit.version>4.8.1</junit.version>
@@ -59,6 +60,18 @@
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate-core.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time-hibernate</artifactId>
+            <version>${joda-time-hibernate.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
