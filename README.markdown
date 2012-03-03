@@ -1,11 +1,11 @@
 Hibernate Profiling
 ===================
 
-One of the main drivers behind this project was to provide a standardised and purposefully limited approach to data access, and to raise awareness by profiling of what is going on under the hood.
+A standardised and purposefully restricted approach to data access, based upon Hibernate, with a simple mechanism to raise awareness of performance behaviour beyond the development environment.
 
 Data Access
 -----------
-The query API is currently limited as follows:
+The query API is currently restricted as follows:
 
 ``` java
 void create(final Createable object);
@@ -18,26 +18,26 @@ List<T> find(final DetachedCriteria criteria);
 List<T> find(final DetachedCriteria criteria, final int firstResult, final int maxResults);
 ```
 
-There's no reason this cannot be extended, but there's purposefully no ``` java find(String) ``` option, which might improve confidence depending on a team's proficiency with databases.
+This could be extended further, but there's purposefully no ``` find(String) ``` option, which might improve confidence depending on a team's proficiency with database querying.
 
 Profiling
 ---------
-A simple way to observe behaviour beyond the development environment where the effects of indexing and tuning might not be obvious.
+A dedicated log file captures query performance. A simple way to observe behaviour beyond the development environment where the effects of indexing and tuning are not normally obvious.
 
 Configuration
 -------------
-Profiling is currently enabled via log4j configuration. This provides the benefit of dynamic Runtime log configuration, not detailed here.
+Profiling is currently enabled via log4j configuration. This provides the benefit of dynamic Runtime log configuration via JMX, not detailed here.
 
 ```properties
 log4j.appender.persistence=org.apache.log4j.RollingFileAppender
-log4j.appender.persistence.File=${catalina.base}/logs/profile-persistence.log
+log4j.appender.persistence.File=${catalina.base}/logs/hibernate-profile.log
 log4j.appender.persistence.MaxFileSize=10MB
 log4j.appender.persistence.MaxBackupIndex=10
 log4j.appender.persistence.layout=org.apache.log4j.PatternLayout
 log4j.appender.persistence.layout.ConversionPattern=%d{ISO8601} %m%n
 
-log4j.logger.com.qmetric.hibernate.profiling.HibernateProfilingInterceptor=TRACE, persistence
-log4j.additivity.com.qmetric.hibernate.profiling.HibernateProfilingInterceptor=false
+log4j.logger.com.aeells.hibernate.profiling.HibernateProfilingInterceptor=TRACE, persistence
+log4j.additivity.com.aeells.hibernate.profiling.HibernateProfilingInterceptor=false
 ```
 
 ``` xml
@@ -46,7 +46,7 @@ log4j.additivity.com.qmetric.hibernate.profiling.HibernateProfilingInterceptor=f
 
     <bean id="dateTimeSource" class="com.qmetric.utilities.time.DefaultDateTimeSource"/>
 
-    <bean id="persistenceProfiler" class="com.qmetric.hibernate.profiling.HibernateProfilingInterceptor">
+    <bean id="persistenceProfiler" class="com.aeells.hibernate.profiling.HibernateProfilingInterceptor">
         <constructor-arg ref="dateTimeSource"/>
     </bean>
 
@@ -115,7 +115,8 @@ Contributing
 
 Author
 ------
-Andrew Eells :: ame@andrew-eells.com :: @agile_cto
+Andrew Eells :: ame@andrew-eells.com :: @agile_cto[2]
 
 [0]: http://help.github.com/forking/
 [1]: http://help.github.com/pull-requests/
+[2]: https://twitter.com/#!/agile_cto
