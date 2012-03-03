@@ -115,9 +115,7 @@ Contributing
 
 Author
 ------
-Andrew Eells www.andrew-eells.com[2]
-ame@andrew-eells.com
-Agile CTO [3]
+[Andrew Eells][2] :: ame@andrew-eells.com :: [@agile_cto][3]
 
 [0]: http://help.github.com/forking/
 [1]: http://help.github.com/pull-requests/
