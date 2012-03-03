@@ -1,14 +1,12 @@
-One of the main drivers behind this project was to provide a standardised, not to mention limiting, approach to 
-data access, and to raise awareness by profiling of what is going on under the hood.
+One of the main drivers behind this project was to provide a standardised, not to mention limiting, approach to data access, and to raise awareness by profiling of what is going on under the hood.
 
-So you'll notice there's no option to submit a String query, something that might give you confidence depending on your
-team's proficiency with databases.
+So there's no option to submit a String query, something that might improve confidence depending on a team's proficiency with databases.
 
-The profiling is also a simple way to view behaviour in an environment beyond development where indexing becomes much
-more prevalent and obvious.
+The profiling is also a simple way to view behaviour in an environment beyond development where indexing becomes much more prevalent and obvious.
+Profiling is enabled via log4j configuration and therefore can be enabled / disabled at Runtime.
 
 
-I think it'd be possible to write a nicer DSL than Hibernate's DetachedCriteria also if anyone would like to fork.
+It might be worthwhile writing a nicer DSL than Hibernate's DetachedCriteria also if anyone would like to fork.
 
 queryFor(Account.class).with("surname", "Smith").with("enabled", true).sortAsc("email").build();
 
