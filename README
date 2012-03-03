@@ -1,0 +1,21 @@
+One of the main drivers behind this project was to provide a standardised, not to mention limiting, approach to 
+data access, and to raise awareness by profiling of what is going on under the hood.
+
+So you'll notice there's no option to submit a String query, something that might give you confidence depending on your
+team's proficiency with databases.
+
+The profiling is also a simple way to view behaviour in an environment beyond development where indexing becomes much
+more prevalent and obvious.
+
+
+I think it'd be possible to write a nicer DSL than Hibernate's DetachedCriteria also if anyone would like to fork.
+
+queryFor(Account.class).with("surname", "Smith").with("enabled", true).sortAsc("email").build();
+
+reads better than the following and would have the benefit of further Hibernate abstraction:
+
+DetachedCriteria.forClass(Account.class)
+  .add(Restrictions.eq("surname", "Smith")
+  .add(Restrictions.eq("enabled", true))
+  .addSort(Order.asc("email"));
+
