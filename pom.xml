@@ -2,12 +2,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.qmetric.hibernate</groupId>
-    <artifactId>qmg-hibernate</artifactId>
+    <groupId>com.aeells</groupId>
+    <artifactId>hibernate-profiling</artifactId>
     <version>3.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>qmg-hibernate</name>
+    <name>hibernate-profiling</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,8 +20,8 @@
         <hibernate-core.version>3.3.2.GA</hibernate-core.version>
         <joda-time-hibernate.version>1.2</joda-time-hibernate.version>
         <log4j.version>1.2.15</log4j.version>
-        <qmg-utilities.testing.version>2.3</qmg-utilities.testing.version>
-        <qmg-utilities.utilities.version>2.3</qmg-utilities.utilities.version>
+        <qmg-utilities.testing.version>1.59</qmg-utilities.testing.version>
+        <qmg-utilities.utilities.version>1.59</qmg-utilities.utilities.version>
         <springframework.version>3.0.3.RELEASE</springframework.version>
         <!-- test dependencies -->
         <junit.version>4.8.1</junit.version>
@@ -291,24 +291,10 @@
 
     </dependencies>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus</id>
-            <name>qmetric-snapshot</name>
-            <url>http://devbox.local/nexus/content/repositories/qmetric-snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-        <repository>
-            <id>nexus</id>
-            <name>qmetric-releases</name>
-            <url>http://devbox.local/nexus/content/repositories/qmetric-releases</url>
-        </repository>
-    </distributionManagement>
-
     <scm>
-        <url>git://github.com/qmg-git/qmg-hibernate.git</url>
-        <connection>scm:git:git://github.com/qmg-git/qmg-hibernate.git</connection>
-        <developerConnection>scm:git:git@github.com:qmg-git/qmg-hibernate.git</developerConnection>
+        <url>git://github.com/aeells/hibernate-profiling.git</url>
+        <connection>scm:git:git://github.com/aeells/hibernate-profiling.git</connection>
+        <developerConnection>scm:git:git@github.com:aeells/hibernate-profiling.git</developerConnection>
     </scm>
 
 </project>
