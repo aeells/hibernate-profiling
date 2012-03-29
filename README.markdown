@@ -92,7 +92,7 @@ log4j.additivity.com.aeells.hibernate.profiling.HibernateProfilingInterceptor=fa
 
 Further Development
 -------------------
-It might be an option to have a nicer DSL than Hibernate's DetachedCriteria also if anyone would like to fork:
+Would be possible to have a clearer DSL than Hibernate's DetachedCriteria, providing further Hibernate abstraction, eg.
 
 ``` java
 queryFor(Account.class).with("surname", "Smith").with("enabled", true).sortAsc("email").build();
