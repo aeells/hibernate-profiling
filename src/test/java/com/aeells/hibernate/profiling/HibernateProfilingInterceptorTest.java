@@ -17,7 +17,6 @@ package com.aeells.hibernate.profiling;
 
 import com.aeells.hibernate.model.AbstractPersistentObject;
 import com.aeells.hibernate.model.PersistentObjectStub;
-import com.qmetric.utilities.time.DateTimeSource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
@@ -26,11 +25,11 @@ import org.aspectj.lang.Signature;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.reflect.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class) @PrepareForTest({Appender.class, BeanUtils.class})
-@SuppressStaticInitializationFor("HibernateProfilingInterceptor")
+@SuppressStaticInitializationFor("com.aeells.hibernate.profiling.HibernateProfilingInterceptor")
 public final class HibernateProfilingInterceptorTest
 {
     private final ProceedingJoinPoint mockCall = mock(ProceedingJoinPoint.class);
@@ -54,9 +53,7 @@ public final class HibernateProfilingInterceptorTest
 
     private final Object mockPersistenceStrategy = mock(Object.class);
 
-    private final DateTimeSource mockDateTimeSource = mock(DateTimeSource.class);
-
-    private HibernateProfilingInterceptor profiler = new HibernateProfilingInterceptor(mockDateTimeSource);
+    private HibernateProfilingInterceptor profiler = new HibernateProfilingInterceptor();
 
     @Before
     public void initialise() throws Throwable

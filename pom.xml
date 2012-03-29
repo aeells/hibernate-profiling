@@ -20,8 +20,6 @@
         <hibernate-core.version>3.3.2.GA</hibernate-core.version>
         <joda-time-hibernate.version>1.2</joda-time-hibernate.version>
         <log4j.version>1.2.15</log4j.version>
-        <qmg-utilities.testing.version>1.59</qmg-utilities.testing.version>
-        <qmg-utilities.utilities.version>1.59</qmg-utilities.utilities.version>
         <springframework.version>3.0.3.RELEASE</springframework.version>
         <!-- test dependencies -->
         <junit.version>4.8.1</junit.version>
@@ -94,17 +92,6 @@
             <version>${commons-beanutils.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.qmetric.utilities</groupId>
-            <artifactId>utilities</artifactId>
-            <version>${qmg-utilities.utilities.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>log4j</groupId>
@@ -129,31 +116,6 @@
                 </exclusion>
             </exclusions>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.qmetric.utilities</groupId>
-            <artifactId>testing</artifactId>
-            <version>${qmg-utilities.testing.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-beans</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

@@ -17,7 +17,6 @@ package com.aeells.hibernate.service;
 
 import com.aeells.hibernate.model.Child;
 import com.aeells.hibernate.model.Parent;
-import com.qmetric.testing.hamcrest.matchers.CollectionMatcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

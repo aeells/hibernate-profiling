@@ -15,7 +15,6 @@
 
 package com.aeells.hibernate.profiling;
 
-import com.qmetric.utilities.time.DateTimeSource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -32,20 +31,17 @@ public final class HibernateProfilingInterceptor
 {
     private static final Logger LOGGER = Logger.getLogger(HibernateProfilingInterceptor.class);
 
-    private final DateTimeSource dateTimeSource;
-
-    @Autowired public HibernateProfilingInterceptor(final DateTimeSource dateTimeSource)
+    @Autowired public HibernateProfilingInterceptor()
     {
-        this.dateTimeSource = dateTimeSource;
     }
 
     public void profileWrites(final ProceedingJoinPoint call, final Object model) throws Throwable
     {
         if (LOGGER.isTraceEnabled())
         {
-            final DateTime start = dateTimeSource.now();
+            final DateTime start = new DateTime();
             call.proceed();
-            logProfileCall(call, model, (new Duration(start, dateTimeSource.now()).getMillis()));
+            logProfileCall(call, model, (new Duration(start, new DateTime()).getMillis()));
         }
         else
         {
@@ -57,9 +53,9 @@ public final class HibernateProfilingInterceptor
     {
         if (LOGGER.isTraceEnabled())
         {
-            final DateTime start = dateTimeSource.now();
+            final DateTime start = new DateTime();
             final Object model = call.proceed();
-            logProfileCall(call, model, (new Duration(start, dateTimeSource.now()).getMillis()));
+            logProfileCall(call, model, (new Duration(start, new DateTime()).getMillis()));
             return model;
         }
         else
@@ -72,9 +68,9 @@ public final class HibernateProfilingInterceptor
     {
         if (LOGGER.isTraceEnabled())
         {
-            final DateTime start = dateTimeSource.now();
+            final DateTime start = new DateTime();
             @SuppressWarnings({"unchecked"}) final List<Object> models = (List<Object>) call.proceed();
-            logProfileCall(call, models, (new Duration(start, dateTimeSource.now()).getMillis()));
+            logProfileCall(call, models, (new Duration(start, new DateTime()).getMillis()));
             return models;
         }
         else
