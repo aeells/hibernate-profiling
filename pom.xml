@@ -253,6 +253,14 @@
 
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>qmetric-thirdparty</name>
+            <url>http://devbox.local/nexus/content/repositories/qmetric-thirdparty</url>
+        </repository>
+    </distributionManagement>
+
     <scm>
         <url>git://github.com/aeells/hibernate-profiling.git</url>
         <connection>scm:git:git://github.com/aeells/hibernate-profiling.git</connection>
