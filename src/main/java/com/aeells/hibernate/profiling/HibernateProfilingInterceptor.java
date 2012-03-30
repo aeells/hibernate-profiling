@@ -31,10 +31,6 @@ public final class HibernateProfilingInterceptor
 {
     private static final Logger LOGGER = Logger.getLogger(HibernateProfilingInterceptor.class);
 
-    @Autowired public HibernateProfilingInterceptor()
-    {
-    }
-
     public void profileWrites(final ProceedingJoinPoint call, final Object model) throws Throwable
     {
         if (LOGGER.isTraceEnabled())
