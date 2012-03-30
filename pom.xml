@@ -254,10 +254,16 @@
     </dependencies>
 
     <distributionManagement>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>qmetric-snapshot</name>
+            <url>http://devbox.local/nexus/content/repositories/qmetric-snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
         <repository>
             <id>nexus</id>
-            <name>qmetric-thirdparty</name>
-            <url>http://devbox.local/nexus/content/repositories/qmetric-thirdparty</url>
+            <name>qmetric-releases</name>
+            <url>http://devbox.local/nexus/content/repositories/qmetric-releases</url>
         </repository>
     </distributionManagement>
 
