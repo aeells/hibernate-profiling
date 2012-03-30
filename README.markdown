@@ -44,11 +44,7 @@ log4j.additivity.com.aeells.hibernate.profiling.HibernateProfilingInterceptor=fa
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-    <bean id="dateTimeSource" class="com.qmetric.utilities.time.DefaultDateTimeSource"/>
-
-    <bean id="persistenceProfiler" class="com.aeells.hibernate.profiling.HibernateProfilingInterceptor">
-        <constructor-arg ref="dateTimeSource"/>
-    </bean>
+    <bean id="persistenceProfiler" class="com.aeells.hibernate.profiling.HibernateProfilingInterceptor"/>
 
     <aop:config>
         <aop:aspect ref="persistenceProfiler">
