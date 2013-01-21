@@ -86,21 +86,6 @@ log4j.additivity.com.aeells.hibernate.profiling.HibernateProfilingInterceptor=fa
 </beans>
 ```
 
-Further Development
--------------------
-Would be possible to have a clearer DSL than Hibernate's DetachedCriteria, providing further Hibernate abstraction, eg.
-
-``` java
-queryFor(Account.class).with("surname", "Smith").with("enabled", true).sortAsc("email").build();
-```
-
-``` java
-DetachedCriteria.forClass(Account.class)
-  .add(Restrictions.eq("surname", "Smith")
-  .add(Restrictions.eq("enabled", true))
-  .addSort(Order.asc("email"));
-```
-
 Contributing
 ------------
 1. [Fork][0] Hibernate profiling
