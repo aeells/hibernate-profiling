@@ -20,7 +20,7 @@
         <hibernate-core.version>3.3.2.GA</hibernate-core.version>
         <joda-time-hibernate.version>1.2</joda-time-hibernate.version>
         <log4j.version>1.2.15</log4j.version>
-        <springframework.version>3.0.3.RELEASE</springframework.version>
+        <springframework.version>5.2.22.RELEASE</springframework.version>
         <!-- test dependencies -->
         <junit.version>4.8.1</junit.version>
         <mockito.version>1.8.5</mockito.version>
